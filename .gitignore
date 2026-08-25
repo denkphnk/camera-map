@@ -1,0 +1,8 @@
+.DS_Store
+.vscode
+.venv
+.env
+.ruff_cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
