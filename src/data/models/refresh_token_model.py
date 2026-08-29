@@ -22,6 +22,6 @@ class RefreshToken(Base):
         DateTime(timezone=True), default=datetime.now(timezone.utc)
     )
     revoked_at: Mapped[datetime] = mapped_column(
-            DateTime(timezone=True)
+            DateTime(timezone=True), nullable=True
         )
 
