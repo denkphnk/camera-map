@@ -8,7 +8,7 @@ from src.core.database import Base
 
 
 class RefreshToken(Base):
-    __tablename__ = 'refresh_tokens'
+    __tablename__ = "refresh_tokens"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), nullable=False)
@@ -21,7 +21,4 @@ class RefreshToken(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.now(timezone.utc)
     )
-    revoked_at: Mapped[datetime] = mapped_column(
-            DateTime(timezone=True), nullable=True
-        )
-
+    revoked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
