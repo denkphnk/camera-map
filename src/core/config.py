@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     MINIO_ROOT_USER: str
     MINIO_ROOT_PASSWORD: str
     JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: str
+    REFRESH_TOKEN_EXPIRE_DAYS: str
     ENVIRONMENT: str
 
     model_config = SettingsConfigDict(env_file=".env")
