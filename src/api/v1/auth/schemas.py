@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel, ConfigDict
 
 class RegisterRequest(BaseModel):
@@ -18,3 +20,11 @@ class RefreshRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
+
+
+class UserResponse(BaseModel):
+    id: uuid.UUID
+    email: str
+    full_name: str
+
+    model_config = ConfigDict(from_attributes=True)
