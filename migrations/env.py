@@ -16,8 +16,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from src.core.config import settings
 from src.core.database import Base
 
-from src.data.models import user_model
-from src.data.models import refresh_token_model
+from src.data.models.user_model import User
+from src.data.models.refresh_token_model import RefreshToken
+from src.data.models.camera_model import DCamera
 
 # this is the Alembic Config object
 config = context.config
