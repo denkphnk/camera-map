@@ -35,7 +35,7 @@ class BaseRepository(Generic[ModelType]):
     ##########################################
     # ЧТЕНИЕ
     ##########################################
-    async def get_by_id(self, id: int) -> ModelType | None:
+    async def get_by_id(self, id: Any) -> ModelType | None:
         """Получает запись по ID"""
         query = select(self.model).where(self.model.id == id)
         result = await self.session.execute(query)
@@ -91,7 +91,7 @@ class BaseRepository(Generic[ModelType]):
         result = await self.session.execute(query)
         return result.first() is not None
 
-    async def exists_by_id(self, id: int) -> bool:
+    async def exists_by_id(self, id: Any) -> bool:
         """Проверяет существование записей по ID"""
         query = select(func.count()).select_from(self.model).where(self.model.id == id)
 
@@ -101,7 +101,7 @@ class BaseRepository(Generic[ModelType]):
     ##########################################
     # ОБНОВЛЕНИЕ
     ##########################################
-    async def update(self, id: int, data: dict[str, Any]) -> ModelType | None:
+    async def update(self, id: Any, data: dict[str, Any]) -> ModelType | None:
         """Обновляет запись по ID"""
         query = (
             update(self.model)
@@ -134,7 +134,7 @@ class BaseRepository(Generic[ModelType]):
     ##########################################
     # УДАЛЕНИЕ
     ##########################################
-    async def delete(self, id: int) -> bool:
+    async def delete(self, id: Any) -> bool:
         """Удаляет запись"""
         query = delete(self.model).where(self.model.id == id)
 
