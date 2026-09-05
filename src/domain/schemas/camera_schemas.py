@@ -1,4 +1,6 @@
-class CameraSearchFilters:
+from pydantic import BaseModel
+
+class CameraSearchFilters(BaseModel):
     search: str | None
     model: str | None
     camera_type: str | None
