@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from src.api.v1.dependencies import get_auth_service
-from src.api.v1.auth.schemas import RefreshRequest, RegisterRequest, LoginRequest, TokenResponse, UserResponse
+from api.v1.auth.auth_schemas import RefreshRequest, RegisterRequest, LoginRequest, TokenResponse, UserResponse
 from src.domain.services.auth_service import AuthService
 
 
