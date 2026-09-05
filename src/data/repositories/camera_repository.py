@@ -5,6 +5,9 @@ from src.data.repositories.base_repository import BaseRepository
 from src.domain.schemas.camera_schemas import CameraSearchFilters
 
 class CameraRepository(BaseRepository[DCamera]):
+    def __init__(self, session):
+        super().__init__(DCamera, session)
+
     async def get_by_camera_id(self, camera_id: str) -> DCamera | None:
         query = select(self.model).where(self.model.camera_id == camera_id)
 

@@ -14,7 +14,7 @@ from src.data.models.user_model import User
 class AuthService:
     def __init__(self, session: AsyncSession, settings: Settings):
         self.session = session
-        self.refresh_repo = RefreshTokenRepository(session)
+        self.refresh_repo = RefreshTokenRepository(session=session)
         self.user_repo = UserRepository(session)
         self.token_service = TokenService(settings)
         self.pwd_service = PasswordService()

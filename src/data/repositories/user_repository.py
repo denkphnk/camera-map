@@ -6,6 +6,8 @@ from src.data.models.user_model import User
 
 class UserRepository(BaseRepository[User]):
     """Класс для работы с Users"""
+    def __init__(self, session):
+        super().__init__(User, session)
 
     ##########################################
     # ПОИСК ПО EMAIL

@@ -8,6 +8,8 @@ from src.data.models.refresh_token_model import RefreshToken
 
 class RefreshTokenRepository(BaseRepository[RefreshToken]):
     """Класс для работы с RefreshTokens"""
+    def __init__(self, session):
+        super().__init__(RefreshToken, session)
 
     ##########################################
     # ПОИСК ПО TOKEN_HASH
