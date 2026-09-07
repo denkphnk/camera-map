@@ -19,6 +19,7 @@ from src.core.database import Base
 from src.data.models.user_model import User
 from src.data.models.refresh_token_model import RefreshToken
 from src.data.models.camera_model import DCamera
+from src.data.models.video_model import Video
 
 # this is the Alembic Config object
 config = context.config
