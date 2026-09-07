@@ -4,6 +4,7 @@ from src.data.models.camera_model import DCamera
 from src.data.repositories.base_repository import BaseRepository
 from src.domain.schemas.camera_schemas import CameraSearchFilters
 
+
 class CameraRepository(BaseRepository[DCamera]):
     def __init__(self, session):
         super().__init__(DCamera, session)
@@ -14,15 +15,14 @@ class CameraRepository(BaseRepository[DCamera]):
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
-
     async def search(self, filters: CameraSearchFilters) -> list[DCamera]:
         query = select(self.model)
         conditions = []
-        
+
         # Полнотекстовый поиск по названию
         if filters.search:
             conditions.append(self.model.camera_name.ilike(f"%{filters.search}%"))
-        
+
         # Точные совпадения
         if filters.model:
             conditions.append(self.model.model == filters.model)
@@ -30,10 +30,9 @@ class CameraRepository(BaseRepository[DCamera]):
             conditions.append(self.model.camera_type == filters.camera_type)
         if filters.camera_class:
             conditions.append(self.model.camera_class == filters.camera_class)
-        
+
         if conditions:
             query = query.where(*conditions)
-        
+
         result = await self.session.execute(query)
         return result.scalars().all()
-        

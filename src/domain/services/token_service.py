@@ -1,10 +1,10 @@
+import datetime
 import secrets
 import uuid
-import datetime
-
 from hashlib import sha256
+
 from jose import jwt
-from jose.exceptions import JWTError, ExpiredSignatureError
+from jose.exceptions import ExpiredSignatureError, JWTError
 
 from src.core.config import Settings
 
@@ -29,7 +29,7 @@ class TokenService:
         return refresh_token
 
     def create_access_token(self, user_id: uuid.UUID) -> str:
-        current_time = datetime.datetime.now(datetime.timezone.utc)
+        current_time = datetime.datetime.now(datetime.UTC)
         exp_time = current_time + datetime.timedelta(
             minutes=self.access_token_expire_minutes
         )

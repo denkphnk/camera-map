@@ -1,7 +1,7 @@
 import json
 import logging
-
 from uuid import UUID
+
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +11,7 @@ from src.domain.schemas.camera_schemas import CameraSearchFilters
 
 logger = logging.getLogger(__name__)
 
+
 class CameraService:
     def __init__(self, session: AsyncSession, redis: Redis):
         self.session = session
@@ -19,7 +20,7 @@ class CameraService:
 
     async def get_geojson(self) -> dict:
         try:
-            cached = await self.redis.get('cameras:geojson')
+            cached = await self.redis.get("cameras:geojson")
             if cached:
                 return json.loads(cached)
         except Exception as e:
@@ -33,13 +34,22 @@ class CameraService:
                 {
                     "type": "Feature",
                     "properties": {"camera_id": camera.camera_id, "has_video": False},
-                    "geometry": {"type": "Point", "coordinates": [camera.camera_longitude, camera.camera_latitude]}
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [
+                            camera.camera_longitude,
+                            camera.camera_latitude,
+                        ],
+                    },
                 }
-            for camera in cameras]
+                for camera in cameras
+            ],
         }
 
         try:
-            await self.redis.set('cameras:geojson', json.dumps(geojson, default=str), ex=300)
+            await self.redis.set(
+                "cameras:geojson", json.dumps(geojson, default=str), ex=300
+            )
         except Exception as e:
             logger.warning(f"Redis write failed for geojson cache: {e}")
 
@@ -48,7 +58,7 @@ class CameraService:
     async def search_cameras(self, filters: CameraSearchFilters) -> list[DCamera]:
         if filters.search and not filters.search.strip():
             filters.search = None
-        
+
         cameras = await self.camera_repo.search(filters)
         return cameras
 
@@ -59,7 +69,6 @@ class CameraService:
 
     async def invalidate_geojson_cache(self):
         try:
-            await self.redis.delete('cameras:geojson')
+            await self.redis.delete("cameras:geojson")
         except Exception:
             logger.warning("Failed to invalidate geojson cache. Will refresh by TTL.")
-            pass

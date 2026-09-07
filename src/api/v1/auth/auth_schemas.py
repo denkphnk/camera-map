@@ -2,6 +2,7 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict
 
+
 class RegisterRequest(BaseModel):
     email: str
     full_name: str

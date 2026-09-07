@@ -1,13 +1,14 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select, update
 
-from src.data.repositories.base_repository import BaseRepository
 from src.data.models.refresh_token_model import RefreshToken
+from src.data.repositories.base_repository import BaseRepository
 
 
 class RefreshTokenRepository(BaseRepository[RefreshToken]):
     """Класс для работы с RefreshTokens"""
+
     def __init__(self, session):
         super().__init__(RefreshToken, session)
 
@@ -27,7 +28,7 @@ class RefreshTokenRepository(BaseRepository[RefreshToken]):
         query = (
             update(self.model)
             .where(self.model.token_hash == token_hash)
-            .values(revoked_at=datetime.now(timezone.utc))
+            .values(revoked_at=datetime.now(UTC))
             .returning(self.model)
         )
         result = await self.session.execute(query)

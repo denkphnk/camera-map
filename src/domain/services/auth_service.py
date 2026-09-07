@@ -1,14 +1,13 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 import datetime
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.core.config import Settings
+from src.data.models.user_model import User
 from src.data.repositories.refresh_token_repository import RefreshTokenRepository
 from src.data.repositories.user_repository import UserRepository
-from src.domain.services.token_service import TokenService
 from src.domain.services.password_service import PasswordService
-
-from src.data.models.user_model import User
+from src.domain.services.token_service import TokenService
 
 
 class AuthService:
@@ -38,7 +37,6 @@ class AuthService:
         if user is None:
             raise ValueError("Invalid email or password")
 
-
         password_verified = self.pwd_service.verify_password(
             password, user.password_hash
         )
@@ -49,12 +47,16 @@ class AuthService:
         refresh_token = self.token_service.create_refresh_token()
         refresh_token_hash = self.token_service.hash_refresh_token(refresh_token)
 
-        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=self.token_service.refresh_token_expire_days
         )
 
         await self.refresh_repo.create(
-            {"user_id": user.id, "token_hash": refresh_token_hash, 'expires_at': expires_at}
+            {
+                "user_id": user.id,
+                "token_hash": refresh_token_hash,
+                "expires_at": expires_at,
+            }
         )
 
         await self.session.commit()
@@ -66,13 +68,13 @@ class AuthService:
         stored_token = await self.refresh_repo.get_by_hash(refresh_token_hash)
 
         if stored_token is None:
-            raise ValueError('Refresh token not found')
+            raise ValueError("Refresh token not found")
 
         if stored_token.revoked_at is not None:
-            raise ValueError('Refresh token revoked.')
+            raise ValueError("Refresh token revoked.")
 
-        if stored_token.expires_at <= datetime.datetime.now(datetime.timezone.utc):
-            raise ValueError('Refresh token expired.')
+        if stored_token.expires_at <= datetime.datetime.now(datetime.UTC):
+            raise ValueError("Refresh token expired.")
 
         user_id = stored_token.user_id
         await self.refresh_repo.revoke(refresh_token_hash)
@@ -81,12 +83,16 @@ class AuthService:
         new_refresh_token = self.token_service.create_refresh_token()
         new_refresh_hash = self.token_service.hash_refresh_token(new_refresh_token)
 
-        expires_at = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
+        expires_at = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
             days=self.token_service.refresh_token_expire_days
         )
 
         await self.refresh_repo.create(
-            {"user_id": user_id, "token_hash": new_refresh_hash, 'expires_at': expires_at}
+            {
+                "user_id": user_id,
+                "token_hash": new_refresh_hash,
+                "expires_at": expires_at,
+            }
         )
 
         await self.session.commit()
@@ -98,7 +104,7 @@ class AuthService:
         exists = await self.refresh_repo.get_by_hash(refresh_token_hash)
 
         if exists is None:
-            raise ValueError('Refresh token not found')
+            raise ValueError("Refresh token not found")
 
         await self.refresh_repo.revoke(refresh_token_hash)
         await self.session.commit()

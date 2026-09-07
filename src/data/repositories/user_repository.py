@@ -1,11 +1,12 @@
 from sqlalchemy import func, or_, select
 
-from src.data.repositories.base_repository import BaseRepository
 from src.data.models.user_model import User
+from src.data.repositories.base_repository import BaseRepository
 
 
 class UserRepository(BaseRepository[User]):
     """Класс для работы с Users"""
+
     def __init__(self, session):
         super().__init__(User, session)
 

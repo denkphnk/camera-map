@@ -1,15 +1,15 @@
 import uuid
+from datetime import datetime
 
 from sqlalchemy import DateTime, SmallInteger, String, func
-from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
-from datetime import datetime, timezone
+from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.database import Base
 
 
 class DCamera(Base):
-    __tablename__ = 'd_camera'
+    __tablename__ = "d_camera"
 
     id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -28,4 +28,6 @@ class DCamera(Base):
     serial_number: Mapped[str] = mapped_column(String(100), nullable=True, unique=True)
     azimuth: Mapped[int] = mapped_column(nullable=True)
     archive: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
-    process_dttm: Mapped[datetime] =  mapped_column(DateTime(timezone=True), nullable=False, default=func.now())
+    process_dttm: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=func.now()
+    )

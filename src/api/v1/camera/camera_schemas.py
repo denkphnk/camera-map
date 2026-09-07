@@ -13,7 +13,6 @@ class CameraSearchFilters(BaseModel):
     video_count_to: int | None = None
 
 
-
 class CameraResponse(BaseModel):
     id: UUID
     camera_id: str
