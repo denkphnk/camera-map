@@ -5,6 +5,7 @@ from pathlib import Path
 
 from fastapi import UploadFile
 
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.services.video_metadata_service import VideoMetadataService
@@ -20,8 +21,10 @@ class VideoService:
         self,
         session: AsyncSession,
         minio_service: MinioService,
+        redis: Redis
     ):
         self.session = session
+        self.redis = redis
         self.video_repo = VideoRepository(session)
         self.user_repo = UserRepository(session)
         self.camera_repo = CameraRepository(session)
@@ -94,6 +97,9 @@ class VideoService:
                     object_name=video.file_object_key,
                 )
 
+            await self.redis.delete("cameras:geojson")
+
+
         return deleted
 
     async def upload_video(
@@ -155,6 +161,9 @@ class VideoService:
 
             await self.session.commit()
             await self.session.refresh(video)
+
+            await self.redis.delete("cameras:geojson")
+
 
             return video
 

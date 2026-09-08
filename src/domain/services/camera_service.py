@@ -26,14 +26,14 @@ class CameraService:
         except Exception as e:
             logger.warning(f"Redis read failed for geojson cache: {e}")
 
-        cameras = await self.camera_repo.get_all()
+        cameras = await self.camera_repo.get_cameras_with_video_count()
 
         geojson = {
             "type": "FeatureCollection",
             "features": [
                 {
                     "type": "Feature",
-                    "properties": {"camera_id": camera.camera_id, "has_video": False},
+                    "properties": {"camera_id": camera.camera_id, "has_video": video_count > 0},
                     "geometry": {
                         "type": "Point",
                         "coordinates": [
@@ -42,7 +42,7 @@ class CameraService:
                         ],
                     },
                 }
-                for camera in cameras
+                for camera, video_count in cameras
             ],
         }
 

@@ -26,6 +26,6 @@ def get_minio_service() -> MinioService:
     return MinioService()
 
 async def get_video_service(
-    session: AsyncSession = Depends(get_db), minio_service: MinioService = Depends(get_minio_service)
+    session: AsyncSession = Depends(get_db), minio_service: MinioService = Depends(get_minio_service), redis: Redis = Depends(get_redis)
 ) -> VideoService:
-    return VideoService(session=session, minio_service=minio_service)
+    return VideoService(session=session, minio_service=minio_service, redis=redis)

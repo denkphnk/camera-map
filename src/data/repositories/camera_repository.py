@@ -1,5 +1,7 @@
-from sqlalchemy import select
+from sqlalchemy import func, select, join
 
+
+from src.data.models.video_model import Video
 from src.data.models.camera_model import DCamera
 from src.data.repositories.base_repository import BaseRepository
 from src.domain.schemas.camera_schemas import CameraSearchFilters
@@ -14,6 +16,22 @@ class CameraRepository(BaseRepository[DCamera]):
 
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
+
+    async def get_cameras_with_video_count(self):
+        query = (
+            select(
+                self.model,
+                func.count(Video.id).label("video_count"),
+            )
+            .outerjoin(
+                Video,
+                Video.camera_id == self.model.id,
+            )
+            .group_by(self.model.id)
+        )
+
+        result = await self.session.execute(query)
+        return result.all()
 
     async def search(self, filters: CameraSearchFilters) -> list[DCamera]:
         query = select(self.model)
