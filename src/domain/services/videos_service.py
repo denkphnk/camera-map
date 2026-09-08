@@ -97,6 +97,11 @@ class VideoService:
                     object_name=video.file_object_key,
                 )
 
+            if video.preview_object_key:
+                self.minio_service.delete_file(
+                    object_name=video.preview_object_key,
+                )
+
             await self.redis.delete("cameras:geojson")
 
 
@@ -121,7 +126,9 @@ class VideoService:
             raise ValueError("File must be a video")
 
         uploaded_object_name = None
-        temp_file = None
+        uploaded_preview_object_name = None
+        temp_path = None
+        preview_path = None
         suffix = Path(file.filename or "").suffix
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
@@ -134,13 +141,30 @@ class VideoService:
         try:
             metadata = self.video_metadata_service.get_metadata(temp_path)
             await file.seek(0)
-            object_key = f"videos/{uuid.uuid4()}{suffix}"
+            file_uuid = uuid.uuid4()
+            object_key = f"videos/{file_uuid}{suffix}"
+            preview_object_key = f"previews/{file_uuid}.jpg"
+
+            preview_path = f"{temp_path}.jpg"
+
+            self.video_metadata_service.extract_first_frame(
+                video_path=temp_path,
+                output_path=preview_path,
+            )
 
             minio_data = await self.minio_service.upload_file(
                 file=file,
                 object_name=object_key,
             )
             uploaded_object_name = minio_data["object_name"]
+
+            preview_data = self.minio_service.upload_local_file(
+                file_path=preview_path,
+                object_name=preview_object_key,
+                content_type="image/jpeg",
+            )
+
+            uploaded_preview_object_name = preview_data["object_name"]
 
             video = await self.video_repo.create(
                 {
@@ -155,6 +179,7 @@ class VideoService:
                     "file_object_key": uploaded_object_name,
                     "file_size": len(contents),
                     "content_type": file.content_type,
+                    "preview_object_key": uploaded_preview_object_name,
                     "camera_id": camera_id
                 }
             )
@@ -171,8 +196,14 @@ class VideoService:
             await self.session.rollback()
             if uploaded_object_name:
                 self.minio_service.delete_file(uploaded_object_name)
+
+            if uploaded_preview_object_name:
+                self.minio_service.delete_file(uploaded_preview_object_name)
             raise
 
         finally:
-            if temp_file and os.path.exists(temp_path):
+            if os.path.exists(temp_path):
                 os.remove(temp_path)
+
+            if preview_path and os.path.exists(preview_path):
+                os.remove(preview_path)

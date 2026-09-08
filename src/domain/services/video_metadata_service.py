@@ -59,3 +59,34 @@ class VideoMetadataService:
             "fps": fps,
             "resolution": resolution,
         }
+
+    def extract_first_frame(
+        self,
+        video_path: str,
+        output_path: str,
+    ) -> str:
+        path = Path(video_path)
+
+        if not path.exists():
+            raise FileNotFoundError(f"Video file not found: {video_path}")
+
+        command = [
+            "ffmpeg",
+            "-i",
+            str(path),
+            "-frames:v",
+            "1",
+            "-q:v",
+            "2",
+            output_path,
+            "-y",
+        ]
+
+        subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        return output_path

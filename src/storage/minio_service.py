@@ -61,6 +61,35 @@ class MinioService:
             "url": url,
         }
 
+    def upload_local_file(
+        self,
+        file_path: str,
+        object_name: str,
+        content_type: str = "application/octet-stream",
+        expires_days: int = 7,
+    ) -> dict[str, str]:
+        with open(file_path, "rb") as file:
+            file_data = file.read()
+
+        self.client.put_object(
+            bucket_name=self.bucket_name,
+            object_name=object_name,
+            data=io.BytesIO(file_data),
+            length=len(file_data),
+            content_type=content_type,
+        )
+
+        url = self.client.presigned_get_object(
+            bucket_name=self.bucket_name,
+            object_name=object_name,
+            expires=timedelta(days=expires_days),
+        )
+
+        return {
+            "object_name": object_name,
+            "url": url,
+        }
+
     def delete_file(self, object_name: str) -> None:
         self.client.remove_object(
             bucket_name=self.bucket_name,
