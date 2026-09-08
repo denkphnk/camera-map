@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     MINIO_SECURE: bool
     MINIO_ROOT_USER: str
     MINIO_ROOT_PASSWORD: str
+    MINIO_BUCKET_NAME: str
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
