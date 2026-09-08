@@ -55,6 +55,13 @@ class Video(Base):
         index=True,
     )
 
+    camera_id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("d_camera.id"),
+        nullable=False,
+        index=True,
+    )
+
     counter: Mapped[int] = mapped_column(
         Integer,
         nullable=False,

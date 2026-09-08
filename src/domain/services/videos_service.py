@@ -11,6 +11,7 @@ from src.domain.services.video_metadata_service import VideoMetadataService
 from src.data.models.video_model import Video
 from src.data.repositories.video_repository import VideoRepository
 from src.data.repositories.user_repository import UserRepository
+from src.data.repositories.camera_repository import CameraRepository
 from src.storage.minio_service import MinioService
 
 
@@ -23,6 +24,7 @@ class VideoService:
         self.session = session
         self.video_repo = VideoRepository(session)
         self.user_repo = UserRepository(session)
+        self.camera_repo = CameraRepository(session)
         self.minio_service = minio_service
         self.video_metadata_service = VideoMetadataService()
 
@@ -37,6 +39,18 @@ class VideoService:
     ) -> tuple[list[Video], int]:
         return await self.video_repo.get_by_author(
             author_id=author_id,
+            offset=offset,
+            limit=limit,
+        )
+
+    async def get_videos_by_camera(
+        self,
+        camera_id: uuid.UUID,
+        offset: int = 0,
+        limit: int = 20,
+    ) -> tuple[list[Video], int]:
+        return await self.video_repo.get_by_camera(
+            camera_id=camera_id,
             offset=offset,
             limit=limit,
         )
@@ -87,10 +101,15 @@ class VideoService:
         file: UploadFile,
         name: str,
         author_id: uuid.UUID,
+        camera_id: uuid.UUID
     ) -> Video:
         author_exists = await self.user_repo.exists_by_id(author_id)
         if not author_exists:
             raise ValueError("Author not found")
+
+        camera_exists = await self.camera_repo.exists_by_id(camera_id)
+        if not camera_exists:
+            raise ValueError("Camera not found")
 
         if not file.content_type or not file.content_type.startswith("video/"):
             raise ValueError("File must be a video")
@@ -130,6 +149,7 @@ class VideoService:
                     "file_object_key": uploaded_object_name,
                     "file_size": len(contents),
                     "content_type": file.content_type,
+                    "camera_id": camera_id
                 }
             )
 

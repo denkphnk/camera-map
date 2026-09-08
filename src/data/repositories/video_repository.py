@@ -32,6 +32,26 @@ class VideoRepository(BaseRepository[Video]):
         result_total = await self.session.execute(total)
         return result.scalars().all(), result_total.scalar_one()
 
+    async def get_by_camera(
+        self, camera_id: Any, offset: int = 0, limit: int = 20
+    ) -> tuple[list[Video], int]:
+        videos = (
+            select(self.model)
+            .where(self.model.camera_id == camera_id)
+            .order_by(self.model.created_at.desc() )
+        )
+        total = (
+            select(func.count())
+            .select_from(self.model)
+            .where(self.model.camera_id == camera_id)
+        )
+
+        videos = videos.offset(offset).limit(limit)
+
+        result = await self.session.execute(videos)
+        result_total = await self.session.execute(total)
+        return result.scalars().all(), result_total.scalar_one()
+
     async def search(
         self,
         name: str | None = None,

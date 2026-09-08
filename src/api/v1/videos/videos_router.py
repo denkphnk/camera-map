@@ -82,6 +82,7 @@ async def upload_video(
     file: UploadFile = File(...),
     name: str = Form(...),
     author_id: UUID = Form(...),
+    camera_id: UUID = Form(...),
     service: VideoService = Depends(get_video_service),
 ):
     try:
@@ -89,6 +90,7 @@ async def upload_video(
             file=file,
             name=name,
             author_id=author_id,
+            camera_id=camera_id,
         )
 
     except ValueError as e:
