@@ -1295,6 +1295,28 @@ standard = ["email-validator (>=2.0.0)", "fastapi-cli[standard] (>=0.0.32)", "fa
 standard-no-fastapi-cloud-cli = ["email-validator (>=2.0.0)", "fastapi-cli[standard-no-fastapi-cloud-cli] (>=0.0.32)", "httpx (>=0.23.0,<1.0.0)", "jinja2 (>=3.1.5)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.18)", "uvicorn[standard] (>=0.12.0)"]
 
 [[package]]
+name = "ffmpeg"
+version = "1.4"
+description = "ffmpeg python package url [https://github.com/jiashaokun/ffmpeg]"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "ffmpeg-1.4.tar.gz", hash = "sha256:6931692c890ff21d39938433c2189747815dca0c60ddc7f9bb97f199dba0b5b9"},
+]
+
+[[package]]
+name = "ffprobe"
+version = "0.5"
+description = "Wrapper around ffprobe command to extract metadata from media files"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "ffprobe-0.5.zip", hash = "sha256:f7dc048df62c6ccc1c602c865a7f0976b2679200fd07ebdc34ce51e9a8205b76"},
+]
+
+[[package]]
 name = "filelock"
 version = "3.32.5"
 description = "A platform independent file lock."
@@ -4463,4 +4485,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.14"
-content-hash = "5180700f8dcb17ad943732d843b23d78d6ee63470ca916c162e9cd11def20f0b"
+content-hash = "6fbec71140823487d79036270fac2ade8281ad644c5d70d85779f28de9be13a8"

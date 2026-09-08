@@ -24,8 +24,8 @@ class User(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=datetime.now(UTC),
-        onupdate=datetime.now(UTC),
+        default=datetime.now,
+        onupdate=datetime.now,
     )
 
     def __repr__(self) -> str:

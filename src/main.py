@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from src.api.v1.auth.auth_router import auth_router
 from src.api.v1.camera.camera_router import camera_router
+from src.api.v1.videos.videos_router import videos_router
 from src.api.v1.exception_handler import value_error_handler
 from src.core.cache import create_redis
 
@@ -23,6 +24,7 @@ app = FastAPI(title="Camera Map API", version="1.0.0", lifespan=lifespan)
 app.add_exception_handler(ValueError, value_error_handler)
 app.include_router(auth_router)
 app.include_router(camera_router)
+app.include_router(videos_router)
 
 
 @app.get("/")
