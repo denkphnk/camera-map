@@ -9,6 +9,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.services.video_metadata_service import VideoMetadataService
+from src.domain.schemas.video_schemas import VideoDetailsResponse, VideoResponse
 from src.data.models.video_model import Video
 from src.data.repositories.video_repository import VideoRepository
 from src.data.repositories.user_repository import UserRepository
@@ -207,3 +208,34 @@ class VideoService:
 
             if preview_path and os.path.exists(preview_path):
                 os.remove(preview_path)
+
+
+    async def get_video_details(self, video_id: uuid.UUID) -> VideoDetailsResponse | None:
+        video = await self.video_repo.get_by_id(video_id)
+
+        if video is None:
+            return None
+
+        return VideoDetailsResponse(
+            **VideoResponse.model_validate(video).model_dump(),
+            video_url=f"/api/v1/videos/{video.id}/stream",
+            preview_url=f"/api/v1/videos/{video.id}/preview",
+        )
+
+    async def get_video_file(self, video_id: uuid.UUID) -> tuple[bytes, str] | None:
+        video = await self.video_repo.get_by_id(video_id)
+
+        if video is None:
+            return None
+
+        file_data = self.minio_service.get_file(video.file_object_key)
+
+        return file_data, video.content_type
+
+    async def get_preview_file(self, video_id: uuid.UUID) -> bytes | None:
+        video = await self.video_repo.get_by_id(video_id)
+
+        if video is None:
+            return None
+
+        return self.minio_service.get_file(video.preview_object_key)

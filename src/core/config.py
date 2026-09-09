@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str
     CELERY_RESULT_BACKEND: str
     MINIO_ENDPOINT: str
+    MINIO_LOCAL_ENDPOINT: str | None
     MINIO_ACCESS_KEY: str
     MINIO_SECRET_KEY: str
     MINIO_SECURE: bool

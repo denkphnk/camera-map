@@ -30,3 +30,8 @@ class VideoSearchFilters(BaseModel):
 class VideoListResponse(BaseModel):
     items: list[VideoResponse]
     total: int
+
+
+class VideoDetailsResponse(VideoResponse):
+    video_url: str
+    preview_url: str

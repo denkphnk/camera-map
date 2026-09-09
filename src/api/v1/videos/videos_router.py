@@ -1,10 +1,13 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi.responses import StreamingResponse
+import io
 
 from src.api.v1.videos.videos_schemas import (
     VideoListResponse,
     VideoResponse,
     VideoSearchFilters,
+    VideoDetailsResponse
 )
 from src.api.v1.dependencies import get_video_service
 from src.domain.services.videos_service import VideoService
@@ -51,11 +54,11 @@ async def increment_counter(
     return video
 
 
-@videos_router.get("/{video_id}", response_model=VideoResponse)
-async def get_video_by_id(
+@videos_router.get("/{video_id}", response_model=VideoDetailsResponse)
+async def get_video_details(
     video_id: UUID, service: VideoService = Depends(get_video_service)
 ):
-    video = await service.get_video_by_id(video_id)
+    video = await service.get_video_details(video_id)
 
     if video is None:
         raise HTTPException(
@@ -98,3 +101,41 @@ async def upload_video(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+
+@videos_router.get("/{video_id}/stream")
+async def stream_video(
+    video_id: UUID,
+    service: VideoService = Depends(get_video_service),
+):
+    result = await service.get_video_file(video_id)
+
+    if result is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Video not found",
+        )
+
+    file_data, content_type = result
+
+    return StreamingResponse(
+        io.BytesIO(file_data),
+        media_type=content_type,
+    )
+
+@videos_router.get("/{video_id}/preview")
+async def get_preview(
+    video_id: UUID,
+    service: VideoService = Depends(get_video_service),
+):
+    preview = await service.get_preview_file(video_id)
+
+    if preview is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Preview not found",
+        )
+
+    return StreamingResponse(
+        io.BytesIO(preview),
+        media_type="image/jpeg",
+    )
