@@ -7,7 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.data.models.camera_model import DCamera
 from src.data.repositories.camera_repository import CameraRepository
-from src.domain.schemas.camera_schemas import CameraSearchFilters
+from src.data.repositories.video_repository import VideoRepository
+from src.domain.schemas.camera_schemas import CameraSearchFilters, CameraDetailsResponse
+
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +18,7 @@ class CameraService:
     def __init__(self, session: AsyncSession, redis: Redis):
         self.session = session
         self.camera_repo = CameraRepository(session)
+        self.video_repo = VideoRepository(session)
         self.redis = redis
 
     async def get_geojson(self) -> dict:
@@ -33,7 +36,10 @@ class CameraService:
             "features": [
                 {
                     "type": "Feature",
-                    "properties": {"camera_id": camera.camera_id, "has_video": video_count > 0},
+                    "properties": {
+                        "camera_id": camera.camera_id,
+                        "has_video": video_count > 0,
+                    },
                     "geometry": {
                         "type": "Point",
                         "coordinates": [
@@ -72,3 +78,17 @@ class CameraService:
             await self.redis.delete("cameras:geojson")
         except Exception:
             logger.warning("Failed to invalidate geojson cache. Will refresh by TTL.")
+
+    async def get_camera_details(
+        self, camera_id: UUID, offset: int = 0, limit: int = 20
+    ) -> CameraDetailsResponse | None:
+        camera = await self.camera_repo.get_by_id(camera_id)
+
+        if camera is None:
+            return None
+
+        videos, total = await self.video_repo.get_by_camera(
+            camera_id, offset=offset, limit=limit
+        )
+
+        return CameraDetailsResponse(camera=camera, videos=videos, total=total)

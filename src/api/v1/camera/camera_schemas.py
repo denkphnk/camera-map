@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+from src.api.v1.videos.videos_schemas import VideoResponse
 
 class CameraSearchFilters(BaseModel):
     search: str | None = None
@@ -32,3 +33,12 @@ class CameraResponse(BaseModel):
     process_dttm: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CameraDetailsResponse(BaseModel):
+    camera: CameraResponse
+    videos: list[VideoResponse]
+    total: int
+
+    model_config = ConfigDict(from_attributes=True)
+    

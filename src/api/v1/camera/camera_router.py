@@ -2,7 +2,11 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.api.v1.camera.camera_schemas import CameraResponse, CameraSearchFilters
+from src.api.v1.camera.camera_schemas import (
+    CameraResponse,
+    CameraSearchFilters,
+    CameraDetailsResponse,
+)
 from src.api.v1.dependencies import get_camera_service
 from src.domain.services.camera_service import CameraService
 
@@ -34,3 +38,22 @@ async def get_camera_by_id(
             status_code=status.HTTP_404_NOT_FOUND, detail="Camera not found"
         )
     return camera
+
+
+@camera_router.get("/{camera_id}/details", response_model=CameraDetailsResponse)
+async def get_camera_details(
+    camera_id: uuid.UUID,
+    offset: int = 0,
+    limit: int = 20,
+    service: CameraService = Depends(get_camera_service),
+):
+    camera_details = await service.get_camera_details(
+        camera_id, offset=offset, limit=limit
+    )
+
+    if camera_details is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Camera not found"
+        )
+
+    return camera_details
