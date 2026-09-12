@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ./backend/.env
     depends_on:
       - postgres
       - redis
@@ -25,8 +25,8 @@ services:
       - MINIO_SECRET_KEY=minioadmin
       - MINIO_SECURE=false
     volumes:
-      - ./src:/app/src
-      - ./migrations:/app/migrations
+      - ./backend/src:/app/src
+      - ./backend/migrations:/app/migrations
     command: sh -c "alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -90,7 +90,7 @@ services:
   # Celery Worker
   celery_worker:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     platform: linux/arm64
     container_name: camera_map_worker
@@ -116,7 +116,7 @@ services:
   # Celery Beat (Scheduler)
   celery_beat:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     platform: linux/arm64
     container_name: camera_map_beat
@@ -134,7 +134,7 @@ services:
   # Flower (Celery Monitoring)
   flower:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     platform: linux/arm64
     container_name: camera_map_flower

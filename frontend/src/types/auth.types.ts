@@ -3,14 +3,13 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
+export interface RegisterRequest {
+  full_name: string;
+  email: string;
+  password: string;
+  organization?: string;
 }
 
-export interface RegisterRequest {
-  email: string;
-  full_name: string;
-  password: string;
+export interface AuthResponse {
+  access_token: string;
 }

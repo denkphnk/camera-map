@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 
 import {
+  Alert,
+  Anchor,
   Button,
-  Container,
   Paper,
   PasswordInput,
   Stack,
@@ -12,88 +12,133 @@ import {
   Title,
 } from "@mantine/core";
 
-import { notifications } from "@mantine/notifications";
+import { Link, useNavigate } from "react-router-dom";
 
-import { register } from "../../api/auth";
+import { useRegister } from "../../hooks/useRegister";
+
+import classes from "./RegisterPage.module.css";
 
 export function RegisterPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [password, setPassword] = useState("");
+  const { mutateAsync, isPending } =
+    useRegister();
 
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] =
+    useState("");
 
-  const handleRegister = async () => {
+  const [fullName, setFullName] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  async function handleSubmit(
+    event: React.FormEvent,
+  ) {
+    event.preventDefault();
+
+    setError("");
+
     try {
-      setLoading(true);
-
-      await register({
+      await mutateAsync({
         email,
         full_name: fullName,
         password,
       });
 
-      notifications.show({
-        title: "Успешно",
-        message: "Аккаунт создан",
-      });
-
-      navigate("/");
+      navigate("/login");
     } catch {
-      notifications.show({
-        title: "Ошибка",
-        message: "Не удалось зарегистрироваться",
-      });
-    } finally {
-      setLoading(false);
+      setError(
+        "Ошибка регистрации",
+      );
     }
-  };
+  }
 
   return (
-    <Container size={420} mt={120}>
-      <Paper p="xl" radius="md" withBorder>
-        <Stack>
-          <Title order={2}>Регистрация</Title>
+    <div className={classes.page}>
+      <Paper
+        shadow="md"
+        radius="lg"
+        p="xl"
+        w={420}
+      >
+        <form
+          onSubmit={handleSubmit}
+        >
+          <Stack>
+            <Title order={2}>
+              Регистрация
+            </Title>
 
-          <TextInput
-            label="ФИО"
-            value={fullName}
-            onChange={(e) =>
-              setFullName(e.currentTarget.value)
-            }
-          />
+            <Text c="dimmed">
+              Создание аккаунта
+            </Text>
 
-          <TextInput
-            label="Почта"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.currentTarget.value)
-            }
-          />
+            {error && (
+              <Alert color="red">
+                {error}
+              </Alert>
+            )}
 
-          <PasswordInput
-            label="Пароль"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.currentTarget.value)
-            }
-          />
+            <TextInput
+              label="ФИО"
+              value={fullName}
+              onChange={(event) =>
+                setFullName(
+                  event.currentTarget
+                    .value,
+                )
+              }
+              required
+            />
 
-          <Button
-            loading={loading}
-            onClick={handleRegister}
-          >
-            Зарегистрироваться
-          </Button>
+            <TextInput
+              label="Email"
+              value={email}
+              onChange={(event) =>
+                setEmail(
+                  event.currentTarget
+                    .value,
+                )
+              }
+              required
+            />
 
-          <Text size="sm">
-            Уже есть аккаунт?{" "}
-            <Link to="/">Войти</Link>
-          </Text>
-        </Stack>
+            <PasswordInput
+              label="Пароль"
+              value={password}
+              onChange={(event) =>
+                setPassword(
+                  event.currentTarget
+                    .value,
+                )
+              }
+              required
+            />
+
+            <Button
+              type="submit"
+              loading={isPending}
+            >
+              Зарегистрироваться
+            </Button>
+
+            <Text size="sm">
+              Уже есть аккаунт?{" "}
+              <Anchor
+                component={Link}
+                to="/login"
+              >
+                Войти
+              </Anchor>
+            </Text>
+          </Stack>
+        </form>
       </Paper>
-    </Container>
+    </div>
   );
 }

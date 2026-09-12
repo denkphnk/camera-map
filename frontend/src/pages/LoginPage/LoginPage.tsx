@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 
 import {
+  Alert,
+  Anchor,
   Button,
-  Container,
   Paper,
   PasswordInput,
   Stack,
@@ -12,84 +12,127 @@ import {
   Title,
 } from "@mantine/core";
 
-import { notifications } from "@mantine/notifications";
+import { Link, useNavigate } from "react-router-dom";
 
-import { login } from "../../api/auth";
+import { useAuth } from "../../context/AuthContext";
+
+import { useLogin } from "../../hooks/useLogin";
+
+import classes from "./LoginPage.module.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const auth = useAuth();
 
-  const handleLogin = async () => {
+  const { mutateAsync, isPending } =
+    useLogin();
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [error, setError] =
+    useState("");
+
+  async function handleSubmit(
+    event: React.FormEvent,
+  ) {
+    event.preventDefault();
+
+    setError("");
+
     try {
-      setLoading(true);
+      const result =
+        await mutateAsync({
+          email,
+          password,
+        });
 
-      const response = await login({
-        email,
-        password,
-      });
-
-      localStorage.setItem(
-        "access_token",
-        response.access_token
-      );
-
-      localStorage.setItem(
-        "refresh_token",
-        response.refresh_token
+      auth.login(
+        result.access_token,
+        result.refresh_token,
       );
 
       navigate("/map");
     } catch {
-      notifications.show({
-        title: "Ошибка",
-        message: "Неверный логин или пароль",
-      });
-    } finally {
-      setLoading(false);
+      setError(
+        "Неверный email или пароль",
+      );
     }
-  };
+  }
 
   return (
-    <Container size={420} mt={120}>
-      <Paper p="xl" radius="md" withBorder>
-        <Stack>
-          <Title order={2}>Авторизация</Title>
+    <div className={classes.page}>
+      <Paper
+        shadow="md"
+        radius="lg"
+        p="xl"
+        w={420}
+      >
+        <form
+          onSubmit={handleSubmit}
+        >
+          <Stack>
+            <Title order={2}>
+              Вход
+            </Title>
 
-          <TextInput
-            label="Почта"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.currentTarget.value)
-            }
-          />
+            <Text c="dimmed">
+              Авторизация в системе
+            </Text>
 
-          <PasswordInput
-            label="Пароль"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.currentTarget.value)
-            }
-          />
+            {error && (
+              <Alert color="red">
+                {error}
+              </Alert>
+            )}
 
-          <Button
-            loading={loading}
-            onClick={handleLogin}
-          >
-            Войти
-          </Button>
+            <TextInput
+              label="Email"
+              value={email}
+              onChange={(event) =>
+                setEmail(
+                  event.currentTarget
+                    .value,
+                )
+              }
+              required
+            />
 
-          <Text size="sm">
-            Нет аккаунта?{" "}
-            <Link to="/register">
-              Зарегистрироваться
-            </Link>
-          </Text>
-        </Stack>
+            <PasswordInput
+              label="Пароль"
+              value={password}
+              onChange={(event) =>
+                setPassword(
+                  event.currentTarget
+                    .value,
+                )
+              }
+              required
+            />
+
+            <Button
+              type="submit"
+              loading={isPending}
+            >
+              Войти
+            </Button>
+
+            <Text size="sm">
+              Нет аккаунта?{" "}
+              <Anchor
+                component={Link}
+                to="/register"
+              >
+                Зарегистрироваться
+              </Anchor>
+            </Text>
+          </Stack>
+        </form>
       </Paper>
-    </Container>
+    </div>
   );
 }

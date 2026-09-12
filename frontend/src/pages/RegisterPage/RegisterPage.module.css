@@ -1,0 +1,29 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f8fa;
+}
+
+.card {
+  width: 500px;
+  margin: auto;
+  z-index: 2;
+}
+
+.background {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(124, 58, 237, 0.08),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(124, 58, 237, 0.12),
+      transparent 35%
+    );
+}

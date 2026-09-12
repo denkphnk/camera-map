@@ -1,0 +1,17 @@
+.sidebar {
+  width: 56px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 8px;
+
+  background: white;
+  border-right: 1px solid #e9ecef;
+}
+
+.bottom {
+  width: 100%;
+}

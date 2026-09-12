@@ -1,0 +1,22 @@
+.dropzone {
+  border: 2px dashed #d0d5dd;
+  border-radius: 12px;
+
+  min-height: 180px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 8px;
+
+  cursor: pointer;
+
+  transition: all 0.15s ease;
+}
+
+.dropzone:hover {
+  border-color: #7c3aed;
+  background: #faf7ff;
+}
