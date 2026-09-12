@@ -2,7 +2,7 @@ services:
   # FastAPI Application
   api:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     platform: linux/arm64
     container_name: camera_map_api
