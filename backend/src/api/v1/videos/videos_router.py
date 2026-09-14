@@ -3,13 +3,14 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from fastapi.responses import StreamingResponse
 import io
 
+from src.data.models.user_model import User
 from src.api.v1.videos.videos_schemas import (
     VideoListResponse,
     VideoResponse,
     VideoSearchFilters,
     VideoDetailsResponse
 )
-from src.api.v1.dependencies import get_video_service
+from src.api.v1.dependencies import get_current_user, get_video_service
 from src.domain.services.videos_service import VideoService
 
 videos_router = APIRouter(prefix="/videos", tags=["Video"])
@@ -84,7 +85,7 @@ async def delete_video(video_id: UUID, service: VideoService = Depends(get_video
 async def upload_video(
     file: UploadFile = File(...),
     name: str = Form(...),
-    author_id: UUID = Form(...),
+    user: User = Depends(get_current_user),
     camera_id: UUID = Form(...),
     service: VideoService = Depends(get_video_service),
 ):
@@ -92,7 +93,7 @@ async def upload_video(
         return await service.upload_video(
             file=file,
             name=name,
-            author_id=author_id,
+            author_id=user.id,
             camera_id=camera_id,
         )
 
