@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   ActionIcon,
-  Box,
   Button,
   Center,
+  Group,
   Loader,
+  Paper,
   ScrollArea,
   Stack,
   Text,
@@ -20,6 +21,7 @@ import {
 
 import Map from "react-map-gl/mapbox";
 import { Marker } from "react-map-gl/mapbox";
+import type { MapRef } from "react-map-gl/mapbox";
 
 import { CameraCard } from "../../components/CameraList/CameraCard";
 import { UploadModal } from "../../components/UploadModal/UploadModal";
@@ -34,10 +36,16 @@ import classes from "./MapPage.module.css";
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export function MapPage() {
-  const [uploadOpened, setUploadOpened] = useState(false);
+  const [uploadOpened, setUploadOpened] =
+    useState(false);
 
-  const [selectedCameraId, setSelectedCameraId] =
-    useState<string | null>(null);
+  const [
+    selectedCameraId,
+    setSelectedCameraId,
+  ] = useState<string | null>(null);
+
+  const mapRef =
+    useRef<MapRef>(null);
 
   const {
     data,
@@ -45,80 +53,123 @@ export function MapPage() {
     isError,
   } = useGeoJson();
 
-  const firstCamera = data?.features?.[0];
+  const firstCamera =
+    data?.features?.[0];
+
+  function handleSelectCamera(
+    feature: GeoJsonFeature,
+  ) {
+    setSelectedCameraId(
+      feature.properties.db_id,
+    );
+
+    mapRef.current?.flyTo({
+      center: [
+        feature.geometry.coordinates[0],
+        feature.geometry.coordinates[1],
+      ],
+      zoom: 15,
+      duration: 1000,
+    });
+  }
 
   return (
     <>
-      <Box className={classes.page}>
-        <Box className={classes.sidebar}>
-          <Box className={classes.header}>
-            <TextInput
-              placeholder="Поиск камеры"
-              leftSection={
-                <IconSearch size={16} />
-              }
-            />
+      <div className={classes.page}>
+        <Paper
+          withBorder
+          radius={0}
+          className={classes.sidebar}
+        >
+          <Stack h="100%" gap={0}>
+            <Paper
+              withBorder
+              radius={0}
+              p="md"
+            >
+              <Stack>
+                <TextInput
+                  placeholder="Поиск камеры"
+                  leftSection={
+                    <IconSearch size={16} />
+                  }
+                />
 
-            <Box className={classes.actions}>
-              <Button
-                leftSection={
-                  <IconUpload size={16} />
-                }
-                disabled={!selectedCameraId}
-                onClick={() =>
-                  setUploadOpened(true)
-                }
-              >
-                Импорт видео
-              </Button>
+                <Group>
+                  <Button
+                    flex={1}
+                    color="violet"
+                    leftSection={
+                      <IconUpload size={16} />
+                    }
+                    disabled={
+                      !selectedCameraId
+                    }
+                    onClick={() =>
+                      setUploadOpened(
+                        true,
+                      )
+                    }
+                  >
+                    Импорт видео
+                  </Button>
 
-              <ActionIcon
-                variant="light"
-                size={36}
-              >
-                <IconFilter size={18} />
-              </ActionIcon>
-            </Box>
-          </Box>
+                  <ActionIcon
+                    size={36}
+                    variant="light"
+                    color="violet"
+                  >
+                    <IconFilter size={18} />
+                  </ActionIcon>
+                </Group>
+              </Stack>
+            </Paper>
 
-          <ScrollArea className={classes.list}>
-            {isLoading && (
-              <Center py="xl">
-                <Loader />
-              </Center>
-            )}
+            <ScrollArea flex={1}>
+              <Stack p="md">
+                {isLoading && (
+                  <Center py="xl">
+                    <Loader />
+                  </Center>
+                )}
 
-            {isError && (
-              <Center py="xl">
-                <Text c="red">
-                  Ошибка загрузки камер
-                </Text>
-              </Center>
-            )}
+                {isError && (
+                  <Center py="xl">
+                    <Text c="red">
+                      Ошибка загрузки
+                      камер
+                    </Text>
+                  </Center>
+                )}
 
-            {!isLoading &&
-              !isError &&
-              data?.features && (
-                <Stack gap="sm">
-                  {data.features.map(
+                {!isLoading &&
+                  !isError &&
+                  data?.features?.map(
                     (
                       feature: GeoJsonFeature,
                     ) => (
                       <div
                         key={
-                          feature.properties
+                          feature
+                            .properties
                             .camera_id
                         }
                         onClick={() =>
-                          setSelectedCameraId(
-                            feature.properties
-                              .camera_id,
+                          handleSelectCamera(
+                            feature,
                           )
                         }
                       >
                         <CameraCard
+                          selected={
+                            selectedCameraId ===
+                            feature
+                              .properties
+                              .db_id
+                          }
                           id={
-                            feature.properties
+                            feature
+                              .properties
                               .camera_id
                           }
                           address="Адрес камеры"
@@ -135,13 +186,18 @@ export function MapPage() {
                       </div>
                     ),
                   )}
-                </Stack>
-              )}
-          </ScrollArea>
-        </Box>
+              </Stack>
+            </ScrollArea>
+          </Stack>
+        </Paper>
 
-        <Box className={classes.mapContainer}>
+        <div
+          className={
+            classes.mapContainer
+          }
+        >
           <Map
+            ref={mapRef}
             className={classes.map}
             mapboxAccessToken={
               MAPBOX_TOKEN
@@ -181,9 +237,8 @@ export function MapPage() {
                 >
                   <div
                     onClick={() =>
-                      setSelectedCameraId(
-                        feature.properties
-                          .camera_id,
+                      handleSelectCamera(
+                        feature,
                       )
                     }
                   >
@@ -198,13 +253,16 @@ export function MapPage() {
               ),
             )}
           </Map>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       <UploadModal
         opened={uploadOpened}
         onClose={() =>
           setUploadOpened(false)
+        }
+        cameraId={
+          selectedCameraId ?? ""
         }
       />
     </>

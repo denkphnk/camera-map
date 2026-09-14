@@ -1,6 +1,10 @@
-import { Card, Group, Text } from "@mantine/core";
-
-import classes from "./CameraCard.module.css";
+import {
+  Badge,
+  Card,
+  Group,
+  Stack,
+  Text,
+} from "@mantine/core";
 
 interface CameraCardProps {
   id: string;
@@ -8,6 +12,7 @@ interface CameraCardProps {
   latitude: number;
   longitude: number;
   camerasCount: number;
+  selected?: boolean;
 }
 
 export function CameraCard({
@@ -16,36 +21,60 @@ export function CameraCard({
   latitude,
   longitude,
   camerasCount,
+  selected = false,
 }: CameraCardProps) {
   return (
     <Card
-      className={classes.card}
-      radius="md"
       withBorder
+      radius="lg"
+      shadow={
+        selected
+          ? "md"
+          : "xs"
+      }
+      p="md"
+      style={{
+        cursor: "pointer",
+        transition: "0.15s",
+        borderColor: selected
+          ? "var(--mantine-color-violet-5)"
+          : undefined,
+      }}
     >
-      <Text fw={600}>
-        Комплекс камер #{id}
-      </Text>
+      <Stack gap="xs">
+        <Group justify="space-between">
+          <Text fw={700}>
+            Камера
+          </Text>
 
-      <Text
-        size="sm"
-        c="dimmed"
-      >
-        {address}
-      </Text>
+          <Badge
+            color="violet"
+            variant="light"
+          >
+            {camerasCount}
+          </Badge>
+        </Group>
 
-      <Text
-        size="xs"
-        c="dimmed"
-      >
-        {longitude}, {latitude}
-      </Text>
-
-      <Group justify="space-between">
         <Text size="sm">
-          Кол-во камер: {camerasCount}
+          #{id}
         </Text>
-      </Group>
+
+        <Text
+          size="xs"
+          c="dimmed"
+        >
+          {address}
+        </Text>
+
+        <Text
+          size="xs"
+          c="dimmed"
+        >
+          {latitude.toFixed(5)},
+          {" "}
+          {longitude.toFixed(5)}
+        </Text>
+      </Stack>
     </Card>
   );
 }

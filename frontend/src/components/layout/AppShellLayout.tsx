@@ -1,17 +1,29 @@
-import { Outlet } from "react-router-dom";
+import {
+  AppShell,
+} from "@mantine/core";
+
+import {
+  Outlet,
+} from "react-router-dom";
 
 import { Sidebar } from "./Sidebar";
 
-import classes from "./AppShellLayout.module.css";
-
 export function AppShellLayout() {
   return (
-    <div className={classes.layout}>
-      <Sidebar />
+    <AppShell
+      padding={0}
+      navbar={{
+        width: 72,
+        breakpoint: 0,
+      }}
+    >
+      <AppShell.Navbar>
+        <Sidebar />
+      </AppShell.Navbar>
 
-      <main className={classes.content}>
+      <AppShell.Main>
         <Outlet />
-      </main>
-    </div>
+      </AppShell.Main>
+    </AppShell>
   );
 }

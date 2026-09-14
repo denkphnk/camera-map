@@ -38,6 +38,7 @@ class CameraService:
                     "type": "Feature",
                     "properties": {
                         "camera_id": camera.camera_id,
+                        "db_id": str(camera.id),
                         "has_video": video_count > 0,
                     },
                     "geometry": {

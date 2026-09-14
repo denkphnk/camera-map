@@ -2,124 +2,174 @@ import {
   Avatar,
   Badge,
   Card,
+  Container,
   Group,
+  Loader,
+  Paper,
   ScrollArea,
   SimpleGrid,
   Stack,
   Text,
   TextInput,
   Title,
+  Center,
 } from "@mantine/core";
 
 import { IconSearch } from "@tabler/icons-react";
 
-import classes from "./ProfilePage.module.css";
+import { useVideos } from "../../hooks/useVideos";
 
 export function ProfilePage() {
+  const {
+    data,
+    isLoading,
+    isError,
+  } = useVideos();
+
   return (
-    <div className={classes.page}>
-      <div className={classes.content}>
-        <Card
+    <Container
+      size="xl"
+      py="xl"
+    >
+      <Stack gap="xl">
+        <Paper
           withBorder
           radius="lg"
-          className={classes.userCard}
+          p="lg"
         >
           <Group>
             <Avatar
               size={72}
               radius="xl"
+              color="violet"
             >
               ИИ
             </Avatar>
 
-            <Stack gap={4}>
+            <Stack gap={2}>
               <Title order={3}>
-                Иван Иванов
+                Личный кабинет
               </Title>
 
               <Text c="dimmed">
-                ivan@mail.ru
-              </Text>
-
-              <Text c="dimmed">
-                ООО Камеры России
+                Мои видео
               </Text>
             </Stack>
           </Group>
-        </Card>
+        </Paper>
 
-        <Card
+        <Paper
           withBorder
           radius="lg"
+          p="lg"
         >
           <Stack>
             <Title order={4}>
-              Последние видео
+              Загруженные видео
             </Title>
 
             <TextInput
-              placeholder="Поиск по названию или пользователю"
+              placeholder="Поиск видео"
               leftSection={
                 <IconSearch size={16} />
               }
             />
 
-            <ScrollArea h={600}>
-              <SimpleGrid cols={2}>
-                {Array.from({
-                  length: 10,
-                }).map((_, index) => (
-                  <Card
-                    key={index}
-                    withBorder
-                    radius="md"
+            {isLoading && (
+              <Center py="xl">
+                <Loader />
+              </Center>
+            )}
+
+            {isError && (
+              <Text c="red">
+                Ошибка загрузки видео
+              </Text>
+            )}
+
+            {!isLoading &&
+              data && (
+                <ScrollArea h={650}>
+                  <SimpleGrid
+                    cols={{
+                      base: 1,
+                      sm: 2,
+                      lg: 3,
+                    }}
                   >
-                    <div
-                      className={
-                        classes.preview
-                      }
-                    />
-
-                    <Stack
-                      mt="sm"
-                      gap={4}
-                    >
-                      <Text fw={600}>
-                        Видео №
-                        {index + 1}
-                      </Text>
-
-                      <Text
-                        size="sm"
-                        c="dimmed"
-                      >
-                        Камера #123456
-                      </Text>
-
-                      <Group
-                        justify="space-between"
-                      >
-                        <Badge
-                          color="green"
+                    {data.items.map(
+                      (video) => (
+                        <Card
+                          key={video.id}
+                          withBorder
+                          radius="md"
+                          shadow="xs"
                         >
-                          Обработано
-                        </Badge>
+                          <Paper
+                            radius="md"
+                            h={180}
+                            style={{
+                              background:
+                                "linear-gradient(135deg,#2e2e38,#1f1f27)",
+                            }}
+                          />
 
-                        <Text
-                          size="xs"
-                          c="dimmed"
-                        >
-                          12.09.2026
-                        </Text>
-                      </Group>
-                    </Stack>
-                  </Card>
-                ))}
-              </SimpleGrid>
-            </ScrollArea>
+                          <Stack
+                            mt="md"
+                            gap={4}
+                          >
+                            <Text fw={600}>
+                              {video.name}
+                            </Text>
+
+                            <Text
+                              size="sm"
+                              c="dimmed"
+                            >
+                              {
+                                video.video_resolution
+                              }
+                            </Text>
+
+                            <Text
+                              size="xs"
+                              c="dimmed"
+                            >
+                              {
+                                video.duration
+                              }
+                              s
+                            </Text>
+
+                            <Group justify="space-between">
+                              <Badge
+                                color="green"
+                                variant="light"
+                              >
+                                {
+                                  video.tracing
+                                }
+                              </Badge>
+
+                              <Text
+                                size="xs"
+                                c="dimmed"
+                              >
+                                {new Date(
+                                  video.created_at,
+                                ).toLocaleDateString()}
+                              </Text>
+                            </Group>
+                          </Stack>
+                        </Card>
+                      ),
+                    )}
+                  </SimpleGrid>
+                </ScrollArea>
+              )}
           </Stack>
-        </Card>
-      </div>
-    </div>
+        </Paper>
+      </Stack>
+    </Container>
   );
 }

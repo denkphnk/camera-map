@@ -21,8 +21,6 @@ import {
 
 import { useAuth } from "../../context/AuthContext";
 
-import classes from "./Sidebar.module.css";
-
 export function Sidebar() {
   const location = useLocation();
 
@@ -44,7 +42,19 @@ export function Sidebar() {
   }
 
   return (
-    <Box className={classes.sidebar}>
+    <Box
+      w={56}
+      h="100vh"
+      p={8}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent:
+          "space-between",
+        borderRight:
+          "1px solid var(--mantine-color-dark-4)",
+      }}
+    >
       <Stack gap="xs">
         <Tooltip
           label="Карта"
@@ -53,6 +63,7 @@ export function Sidebar() {
           <ActionIcon
             component={NavLink}
             to="/map"
+            color="violet"
             variant={
               isActive("/map")
                 ? "filled"
@@ -64,7 +75,7 @@ export function Sidebar() {
             <IconMap2 size={20} />
           </ActionIcon>
         </Tooltip>
-          <br />
+
         <Tooltip
           label="Видео"
           position="right"
@@ -72,6 +83,7 @@ export function Sidebar() {
           <ActionIcon
             component={NavLink}
             to="/profile"
+            color="violet"
             variant={
               isActive("/profile")
                 ? "filled"
@@ -85,7 +97,7 @@ export function Sidebar() {
         </Tooltip>
       </Stack>
 
-      <Box className={classes.bottom}>
+      <Box>
         <Divider mb="md" />
 
         <Stack gap="xs">
@@ -96,6 +108,7 @@ export function Sidebar() {
             <ActionIcon
               component={NavLink}
               to="/profile"
+              color="violet"
               variant={
                 isActive("/profile")
                   ? "filled"

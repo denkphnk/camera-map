@@ -3,6 +3,7 @@ export interface GeoJsonFeature {
 
   properties: {
     camera_id: string;
+    db_id: string;
     has_video: boolean;
   };
 
