@@ -7,15 +7,22 @@ from pydantic import BaseModel, ConfigDict, Field
 class VideoResponse(BaseModel):
     id: UUID
     name: str
+
     duration: float
     video_resolution: str
     fps: float
+
     time_of_day: str
     tracing: str
+
     author_id: UUID
+    author_name: str | None = None
+
     counter: int
+
     file_size: int
     content_type: str
+
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

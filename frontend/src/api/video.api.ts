@@ -57,6 +57,10 @@ export const videoApi = {
 
   deleteVideo(videoId: string) {
   return api.delete(`/videos/${videoId}`);
-},
+  },
+  
+  getVideos() {
+  return api.get("/videos");
+  },
 };
 

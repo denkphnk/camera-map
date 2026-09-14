@@ -17,6 +17,6 @@ export interface MeResponse {
   id: string;
   email: string;
   full_name: string;
-  total_videos: number;
   videos: UserVideo[];
+  total_videos: number;
 }

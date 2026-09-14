@@ -9,6 +9,7 @@ export interface Video {
   created_at: string;
   video_url: string;
   preview_url: string;
+  author_name: string;
 }
 
 export interface VideoListResponse {
