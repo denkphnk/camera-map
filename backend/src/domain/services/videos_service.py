@@ -218,8 +218,8 @@ class VideoService:
 
         return VideoDetailsResponse(
             **VideoResponse.model_validate(video).model_dump(),
-            video_url=f"/api/v1/videos/{video.id}/stream",
-            preview_url=f"/api/v1/videos/{video.id}/preview",
+            video_url=f"http://localhost:8000/videos/{video.id}/stream",
+            preview_url=f"http://localhost:8000/videos/{video.id}/preview",
         )
 
     async def get_video_file(self, video_id: uuid.UUID) -> tuple[bytes, str] | None:

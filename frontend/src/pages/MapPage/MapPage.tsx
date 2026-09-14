@@ -1,7 +1,6 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import {
-  ActionIcon,
   Button,
   Center,
   Group,
@@ -14,7 +13,6 @@ import {
 } from "@mantine/core";
 
 import {
-  IconFilter,
   IconSearch,
   IconUpload,
 } from "@tabler/icons-react";
@@ -33,7 +31,8 @@ import type { GeoJsonFeature } from "../../types/camera.types";
 
 import classes from "./MapPage.module.css";
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+const MAPBOX_TOKEN =
+  import.meta.env.VITE_MAPBOX_TOKEN;
 
 export function MapPage() {
   const [uploadOpened, setUploadOpened] =
@@ -43,6 +42,24 @@ export function MapPage() {
     selectedCameraId,
     setSelectedCameraId,
   ] = useState<string | null>(null);
+
+  const [search, setSearch] =
+    useState("");
+
+  const [model, setModel] =
+    useState("");
+
+  const [cameraType, setCameraType] =
+    useState("");
+
+  const [cameraClass, setCameraClass] =
+    useState("");
+
+  const [videoFrom, setVideoFrom] =
+    useState("");
+
+  const [videoTo, setVideoTo] =
+    useState("");
 
   const mapRef =
     useRef<MapRef>(null);
@@ -55,6 +72,92 @@ export function MapPage() {
 
   const firstCamera =
     data?.features?.[0];
+
+  const filteredFeatures =
+    useMemo(() => {
+      if (!data?.features) {
+        return [];
+      }
+
+      const query =
+        search.trim().toLowerCase();
+
+      return data.features.filter(
+        (
+          feature: GeoJsonFeature,
+        ) => {
+          const p =
+            feature.properties;
+
+          const searchMatch =
+            !query ||
+            p.camera_id
+              .toLowerCase()
+              .includes(query) ||
+            (p.address ?? "")
+              .toLowerCase()
+              .includes(query) ||
+            (p.camera_name ?? "")
+              .toLowerCase()
+              .includes(query);
+
+          const modelMatch =
+            !model ||
+            (p.model ?? "")
+              .toLowerCase()
+              .includes(
+                model.toLowerCase(),
+              );
+
+          const typeMatch =
+            !cameraType ||
+            (
+              p.camera_type ?? ""
+            )
+              .toLowerCase()
+              .includes(
+                cameraType.toLowerCase(),
+              );
+
+          const classMatch =
+            !cameraClass ||
+            (
+              p.camera_class ?? ""
+            )
+              .toLowerCase()
+              .includes(
+                cameraClass.toLowerCase(),
+              );
+
+          const fromMatch =
+            !videoFrom ||
+            p.video_count >=
+              Number(videoFrom);
+
+          const toMatch =
+            !videoTo ||
+            p.video_count <=
+              Number(videoTo);
+
+          return (
+            searchMatch &&
+            modelMatch &&
+            typeMatch &&
+            classMatch &&
+            fromMatch &&
+            toMatch
+          );
+        },
+      );
+    }, [
+      data,
+      search,
+      model,
+      cameraType,
+      cameraClass,
+      videoFrom,
+      videoTo,
+    ]);
 
   function handleSelectCamera(
     feature: GeoJsonFeature,
@@ -89,39 +192,101 @@ export function MapPage() {
             >
               <Stack>
                 <TextInput
+                  value={search}
+                  onChange={(event) =>
+                    setSearch(
+                      event.currentTarget.value,
+                    )
+                  }
                   placeholder="Поиск камеры"
                   leftSection={
                     <IconSearch size={16} />
                   }
                 />
 
-                <Group>
-                  <Button
-                    flex={1}
-                    color="violet"
-                    leftSection={
-                      <IconUpload size={16} />
-                    }
-                    disabled={
-                      !selectedCameraId
-                    }
-                    onClick={() =>
-                      setUploadOpened(
-                        true,
+                <TextInput
+                  value={model}
+                  onChange={(event) =>
+                    setModel(
+                      event.currentTarget.value,
+                    )
+                  }
+                  placeholder="Модель камеры"
+                />
+
+                <TextInput
+                  value={cameraType}
+                  onChange={(event) =>
+                    setCameraType(
+                      event.currentTarget.value,
+                    )
+                  }
+                  placeholder="Тип камеры"
+                />
+
+                <TextInput
+                  value={cameraClass}
+                  onChange={(event) =>
+                    setCameraClass(
+                      event.currentTarget.value,
+                    )
+                  }
+                  placeholder="Класс камеры"
+                />
+
+                <Group grow>
+                  <TextInput
+                    value={videoFrom}
+                    onChange={(event) =>
+                      setVideoFrom(
+                        event.currentTarget.value,
                       )
                     }
-                  >
-                    Импорт видео
-                  </Button>
+                    placeholder="Видео от"
+                  />
 
-                  <ActionIcon
-                    size={36}
-                    variant="light"
-                    color="violet"
-                  >
-                    <IconFilter size={18} />
-                  </ActionIcon>
+                  <TextInput
+                    value={videoTo}
+                    onChange={(event) =>
+                      setVideoTo(
+                        event.currentTarget.value,
+                      )
+                    }
+                    placeholder="Видео до"
+                  />
                 </Group>
+
+                <Button
+                  color="gray"
+                  variant="light"
+                  onClick={() => {
+                    setSearch("");
+                    setModel("");
+                    setCameraType("");
+                    setCameraClass("");
+                    setVideoFrom("");
+                    setVideoTo("");
+                  }}
+                >
+                  Сбросить фильтры
+                </Button>
+
+                <Button
+                  color="violet"
+                  leftSection={
+                    <IconUpload size={16} />
+                  }
+                  disabled={
+                    !selectedCameraId
+                  }
+                  onClick={() =>
+                    setUploadOpened(
+                      true,
+                    )
+                  }
+                >
+                  Импорт видео
+                </Button>
               </Stack>
             </Paper>
 
@@ -136,22 +301,20 @@ export function MapPage() {
                 {isError && (
                   <Center py="xl">
                     <Text c="red">
-                      Ошибка загрузки
-                      камер
+                      Ошибка загрузки камер
                     </Text>
                   </Center>
                 )}
 
                 {!isLoading &&
                   !isError &&
-                  data?.features?.map(
+                  filteredFeatures.map(
                     (
                       feature: GeoJsonFeature,
                     ) => (
                       <div
                         key={
-                          feature
-                            .properties
+                          feature.properties
                             .camera_id
                         }
                         onClick={() =>
@@ -163,16 +326,18 @@ export function MapPage() {
                         <CameraCard
                           selected={
                             selectedCameraId ===
-                            feature
-                              .properties
+                            feature.properties
                               .db_id
                           }
                           id={
-                            feature
-                              .properties
+                            feature.properties
                               .camera_id
                           }
-                          address="Адрес камеры"
+                          address={
+                            feature.properties
+                              .address ??
+                            "Адрес не указан"
+                          }
                           latitude={
                             feature.geometry
                               .coordinates[1]
@@ -181,10 +346,24 @@ export function MapPage() {
                             feature.geometry
                               .coordinates[0]
                           }
-                          camerasCount={1}
+                          camerasCount={
+                            feature.properties
+                              .video_count
+                          }
                         />
                       </div>
                     ),
+                  )}
+
+                {!isLoading &&
+                  !isError &&
+                  filteredFeatures.length ===
+                    0 && (
+                    <Center py="xl">
+                      <Text c="dimmed">
+                        Камеры не найдены
+                      </Text>
+                    </Center>
                   )}
               </Stack>
             </ScrollArea>
@@ -217,7 +396,7 @@ export function MapPage() {
               zoom: 11,
             }}
           >
-            {data?.features.map(
+            {filteredFeatures.map(
               (
                 feature: GeoJsonFeature,
               ) => (

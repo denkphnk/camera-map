@@ -1,9 +1,5 @@
 import { api } from "./axios";
 
-import type {
-  VideoListResponse,
-} from "../types/video.types";
-
 export const videoApi = {
   upload(
     file: File,
@@ -40,13 +36,27 @@ export const videoApi = {
   },
 
   getMyVideos() {
-    return api.get<VideoListResponse>(
-      "/videos",
-      {
-        params: {
-          limit: 100,
-        },
-      },
-    );
+    return api.get("/videos/me");
   },
+
+  getVideoStreamUrl(
+    videoId: string,
+  ) {
+    return `${
+      import.meta.env.VITE_API_URL
+    }/videos/${videoId}/stream`;
+  },
+
+  getPreviewUrl(
+    videoId: string,
+  ) {
+    return `${
+      import.meta.env.VITE_API_URL
+    }/videos/${videoId}/preview`;
+  },
+
+  deleteVideo(videoId: string) {
+  return api.delete(`/videos/${videoId}`);
+},
 };
+

@@ -8,7 +8,8 @@ from src.api.v1.videos.videos_schemas import (
     VideoListResponse,
     VideoResponse,
     VideoSearchFilters,
-    VideoDetailsResponse
+    VideoDetailsResponse,
+    VideoDetailsListResponse
 )
 from src.api.v1.dependencies import get_current_user, get_video_service
 from src.domain.services.videos_service import VideoService
@@ -27,6 +28,28 @@ async def get_videos(
 
     return VideoListResponse(items=videos, total=total)
 
+@videos_router.get("/me", response_model=VideoDetailsListResponse)
+async def get_my_videos(
+    user: User = Depends(get_current_user),
+    service: VideoService = Depends(get_video_service),
+):
+    videos, total = await service.get_videos_by_author(
+        author_id=user.id,
+        offset=0,
+        limit=100,
+    )
+
+    return VideoDetailsListResponse(
+        items=[
+            VideoDetailsResponse(
+                **VideoResponse.model_validate(video).model_dump(),
+                video_url=f"http://localhost:8000/videos/{video.id}/stream",
+                preview_url=f"http://localhost:8000/videos/{video.id}/preview",
+            )
+            for video in videos
+        ],
+        total=total,
+    )
 
 @videos_router.get("/author/{author_id}", response_model=VideoListResponse)
 async def get_videos_by_author(
@@ -140,3 +163,4 @@ async def get_preview(
         io.BytesIO(preview),
         media_type="image/jpeg",
     )
+

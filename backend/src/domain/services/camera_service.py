@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.data.models.camera_model import DCamera
 from src.data.repositories.camera_repository import CameraRepository
 from src.data.repositories.video_repository import VideoRepository
-from src.domain.schemas.camera_schemas import CameraSearchFilters, CameraDetailsResponse
+from src.domain.schemas.camera_schemas import CameraSearchFilters, CameraDetailsResponse, CameraResponse
 
 
 logger = logging.getLogger(__name__)
@@ -39,6 +39,12 @@ class CameraService:
                     "properties": {
                         "camera_id": camera.camera_id,
                         "db_id": str(camera.id),
+                        "address": camera.camera_place,
+                        "camera_name": camera.camera_name,
+                        "model": camera.model,
+                        "camera_type": camera.camera_type,
+                        "camera_class": camera.camera_class,
+                        "video_count": video_count,
                         "has_video": video_count > 0,
                     },
                     "geometry": {
@@ -62,12 +68,21 @@ class CameraService:
 
         return geojson
 
-    async def search_cameras(self, filters: CameraSearchFilters) -> list[DCamera]:
-        if filters.search and not filters.search.strip():
-            filters.search = None
+    async def search_cameras(
+        self,
+        filters: CameraSearchFilters,
+    ):
+        rows = await self.camera_repo.search(
+            filters,
+        )
 
-        cameras = await self.camera_repo.search(filters)
-        return cameras
+        return [
+            CameraResponse(
+                **camera.__dict__,
+                video_count=video_count,
+            )
+            for camera, video_count in rows
+        ]
 
     async def get_camera_by_id(self, camera_id: UUID) -> DCamera | None:
         camera = await self.camera_repo.get_by_id(camera_id)

@@ -18,19 +18,29 @@ class CameraResponse(BaseModel):
     camera_name: str
     camera_place: str | None
     camera_place_cd: int | None
+
     camera_latitude: float
     camera_longitude: float
+
     camera_type: str | None
     camera_type_cd: int | None
+
     camera_class: str | None
     camera_class_cd: int | None
+
     model: str | None
     serial_number: str | None
+
     azimuth: int | None
     archive: int
+
     process_dttm: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    video_count: int
+
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
 
 class CameraDetailsResponse(BaseModel):
     camera: CameraResponse

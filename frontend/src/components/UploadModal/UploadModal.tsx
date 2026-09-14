@@ -12,11 +12,9 @@ import {
   ThemeIcon,
 } from "@mantine/core";
 
-import {
-  IconCheck,
-  IconUpload,
-  IconX,
-} from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
+
+import { IconUpload } from "@tabler/icons-react";
 
 import { videoApi } from "../../api/video.api";
 
@@ -79,11 +77,25 @@ export function UploadModal({
 
       setProgress(100);
 
+      notifications.show({
+        color: "green",
+        title: "Успешно",
+        message:
+          "Видео успешно загружено",
+      });
+
       setTimeout(() => {
         handleClose();
       }, 700);
     } catch {
       setIsError(true);
+
+      notifications.show({
+        color: "red",
+        title: "Ошибка",
+        message:
+          "Не удалось загрузить видео",
+      });
     } finally {
       setIsUploading(false);
     }
@@ -222,28 +234,10 @@ export function UploadModal({
           )}
 
           {isError && (
-            <Alert
-              color="red"
-              icon={
-                <IconX size={16} />
-              }
-            >
+            <Alert color="red">
               Ошибка загрузки
             </Alert>
           )}
-
-          {!isUploading &&
-            !isError &&
-            progress === 100 && (
-              <Alert
-                color="green"
-                icon={
-                  <IconCheck size={16} />
-                }
-              >
-                Видео успешно загружено
-              </Alert>
-            )}
 
           <Group justify="space-between">
             <Button

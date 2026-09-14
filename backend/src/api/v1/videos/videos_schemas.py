@@ -39,3 +39,7 @@ class VideoListResponse(BaseModel):
 class VideoDetailsResponse(VideoResponse):
     video_url: str
     preview_url: str
+
+class VideoDetailsListResponse(BaseModel):
+    items: list[VideoDetailsResponse]
+    total: int
