@@ -15,7 +15,6 @@ import {
 import { useParams } from "react-router-dom";
 
 import { useCameraDetails } from "../../hooks/useCameraDetails";
-import type { Video } from "../../types/video.types";
 
 const API_URL =
   import.meta.env.VITE_API_URL;

@@ -9,11 +9,15 @@ from src.api.v1.videos.videos_router import videos_router
 from src.api.v1.users.user_routers import user_router
 from src.api.v1.exception_handler import value_error_handler
 from src.core.cache import create_redis
+from src.storage.minio_service import MinioService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.redis = create_redis()
+
+    minio_service = MinioService()
+    minio_service.create_bucket_if_not_exists()
 
     try:
         await app.state.redis.ping()
@@ -22,7 +26,11 @@ async def lifespan(app: FastAPI):
         await app.state.redis.aclose()
 
 
-app = FastAPI(title="Camera Map API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title="Camera Map API",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,6 +43,7 @@ app.add_middleware(
 )
 
 app.add_exception_handler(ValueError, value_error_handler)
+
 app.include_router(auth_router)
 app.include_router(camera_router)
 app.include_router(videos_router)

@@ -379,20 +379,19 @@ export function MapPage() {
         >
           <Map
             ref={mapRef}
-            className={classes.map}
-            mapboxAccessToken={
-              MAPBOX_TOKEN
-            }
+            mapboxAccessToken={MAPBOX_TOKEN}
             mapStyle="mapbox://styles/mapbox/streets-v12"
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
             initialViewState={{
               latitude:
-                firstCamera?.geometry
-                  .coordinates[1] ??
+                firstCamera?.geometry.coordinates[1] ??
                 55.751244,
 
               longitude:
-                firstCamera?.geometry
-                  .coordinates[0] ??
+                firstCamera?.geometry.coordinates[0] ??
                 37.618423,
 
               zoom: 11,
