@@ -36,7 +36,7 @@ class CameraResponse(BaseModel):
 
     process_dttm: datetime
 
-    video_count: int
+    video_count: int | None = None
 
     model_config = ConfigDict(
         from_attributes=True,

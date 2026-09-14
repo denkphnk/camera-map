@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Button,
@@ -60,6 +61,8 @@ export function MapPage() {
 
   const [videoTo, setVideoTo] =
     useState("");
+
+  const navigate = useNavigate();
 
   const mapRef =
     useRef<MapRef>(null);
@@ -326,29 +329,28 @@ export function MapPage() {
                         <CameraCard
                           selected={
                             selectedCameraId ===
-                            feature.properties
-                              .db_id
+                            feature.properties.db_id
                           }
                           id={
-                            feature.properties
-                              .camera_id
+                            feature.properties.camera_id
                           }
                           address={
-                            feature.properties
-                              .address ??
+                            feature.properties.address ??
                             "Адрес не указан"
                           }
                           latitude={
-                            feature.geometry
-                              .coordinates[1]
+                            feature.geometry.coordinates[1]
                           }
                           longitude={
-                            feature.geometry
-                              .coordinates[0]
+                            feature.geometry.coordinates[0]
                           }
                           camerasCount={
-                            feature.properties
-                              .video_count
+                            feature.properties.video_count
+                          }
+                          onDetails={() =>
+                            navigate(
+                              `/cameras/${feature.properties.db_id}`,
+                            )
                           }
                         />
                       </div>

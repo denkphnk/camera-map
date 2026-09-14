@@ -15,7 +15,6 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
-
 import { useLogin } from "../../hooks/useLogin";
 
 import classes from "./LoginPage.module.css";
@@ -66,22 +65,35 @@ export function LoginPage() {
 
   return (
     <div className={classes.page}>
+      <div
+        className={classes.background}
+      />
+
       <Paper
-        shadow="md"
-        radius="lg"
+        className={classes.card}
+        radius="xl"
         p="xl"
-        w={420}
+        withBorder
+        bg="dark.7"
       >
         <form
           onSubmit={handleSubmit}
         >
           <Stack>
-            <Title order={2}>
-              Вход
+            <Title
+              order={2}
+              ta="center"
+              c="white"
+            >
+              Вход в систему
             </Title>
 
-            <Text c="dimmed">
-              Авторизация в системе
+            <Text
+              ta="center"
+              c="dimmed"
+              size="sm"
+            >
+              Карта камер и видео
             </Text>
 
             {error && (
@@ -92,6 +104,7 @@ export function LoginPage() {
 
             <TextInput
               label="Email"
+              placeholder="example@mail.com"
               value={email}
               onChange={(event) =>
                 setEmail(
@@ -104,6 +117,7 @@ export function LoginPage() {
 
             <PasswordInput
               label="Пароль"
+              placeholder="Введите пароль"
               value={password}
               onChange={(event) =>
                 setPassword(
@@ -116,12 +130,17 @@ export function LoginPage() {
 
             <Button
               type="submit"
+              color="violet"
               loading={isPending}
+              fullWidth
             >
               Войти
             </Button>
 
-            <Text size="sm">
+            <Text
+              size="sm"
+              ta="center"
+            >
               Нет аккаунта?{" "}
               <Anchor
                 component={Link}

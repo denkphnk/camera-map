@@ -12,6 +12,7 @@ import { RegisterPage } from "../pages/RegisterPage/RegisterPage";
 import { MapPage } from "../pages/MapPage/MapPage";
 import { ProfilePage } from "../pages/ProfilePage/ProfilePage";
 import { LocationPage } from "../pages/LocationPage/LocationPage";
+import { CameraDetailsPage } from "../pages/CameraDetailsPage/CameraDetailsPage";
 
 export const router =
   createBrowserRouter([
@@ -62,6 +63,13 @@ export const router =
                 <LocationPage />
               ),
             },
+            {
+            path: "/cameras/:cameraId",
+            element: (
+              <CameraDetailsPage />
+            ),
+            },
+
           ],
         },
       ],

@@ -1,29 +1,37 @@
 .page {
-  display: flex;
-  min-height: 100vh;
-  background: #f8f8fa;
-}
+  position: relative;
 
-.card {
-  width: 500px;
-  margin: auto;
-  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 100vh;
+
+  background: #0f0f12;
+
+  overflow: hidden;
 }
 
 .background {
   position: absolute;
-
   inset: 0;
 
   background:
     radial-gradient(
       circle at 20% 20%,
-      rgba(124, 58, 237, 0.08),
-      transparent 35%
+      rgba(124, 58, 237, 0.18),
+      transparent 30%
     ),
     radial-gradient(
       circle at 80% 80%,
-      rgba(124, 58, 237, 0.12),
-      transparent 35%
+      rgba(168, 85, 247, 0.15),
+      transparent 30%
     );
+}
+
+.card {
+  width: 420px;
+  z-index: 1;
+
+  backdrop-filter: blur(12px);
 }

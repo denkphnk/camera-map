@@ -1,4 +1,4 @@
-from sqlalchemy import func, select, join
+from sqlalchemy import func, or_, select, join
 
 
 from src.data.models.video_model import Video
@@ -73,10 +73,16 @@ class CameraRepository(BaseRepository[DCamera]):
                 == filters.camera_type
             )
 
-        if filters.camera_class:
+        if filters.search:
             query = query.where(
-                self.model.camera_class
-                == filters.camera_class
+                or_(
+                    self.model.camera_id.ilike(
+                        f"%{filters.search}%"
+                    ),
+                    self.model.camera_name.ilike(
+                        f"%{filters.search}%"
+                    ),
+                )
             )
 
         if filters.video_count_from is not None:

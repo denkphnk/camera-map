@@ -23,4 +23,10 @@ export const cameraApi = {
       params: filters,
     });
   },
+  getCameraDetails(cameraId: string) {
+  return api.get(
+    `/cameras/${cameraId}/details`,
+  );
+  },
 };
+

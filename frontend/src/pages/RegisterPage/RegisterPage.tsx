@@ -60,23 +60,36 @@ export function RegisterPage() {
 
   return (
     <div className={classes.page}>
+      <div
+        className={classes.background}
+      />
+
       <Paper
-        shadow="md"
-        radius="lg"
+        className={classes.card}
+        radius="xl"
         p="xl"
-        w={420}
+        withBorder
+        bg="dark.7"
       >
         <form
           onSubmit={handleSubmit}
         >
           <Stack>
-            <Title order={2}>
-              Регистрация
-            </Title>
+            <Title
+            order={2}
+            ta="center"
+            c="white"
+          >
+            Вход в систему
+          </Title>
 
-            <Text c="dimmed">
-              Создание аккаунта
-            </Text>
+          <Text
+            ta="center"
+            c="dimmed"
+            size="sm"
+          >
+            Создание нового аккаунта
+          </Text>
 
             {error && (
               <Alert color="red">
@@ -86,6 +99,7 @@ export function RegisterPage() {
 
             <TextInput
               label="ФИО"
+              placeholder="Иванов Иван Иванович"
               value={fullName}
               onChange={(event) =>
                 setFullName(
@@ -98,6 +112,7 @@ export function RegisterPage() {
 
             <TextInput
               label="Email"
+              placeholder="example@mail.com"
               value={email}
               onChange={(event) =>
                 setEmail(
@@ -110,6 +125,7 @@ export function RegisterPage() {
 
             <PasswordInput
               label="Пароль"
+              placeholder="Придумайте пароль"
               value={password}
               onChange={(event) =>
                 setPassword(
@@ -122,12 +138,17 @@ export function RegisterPage() {
 
             <Button
               type="submit"
+              color="violet"
               loading={isPending}
+              fullWidth
             >
               Зарегистрироваться
             </Button>
 
-            <Text size="sm">
+            <Text
+              size="sm"
+              ta="center"
+            >
               Уже есть аккаунт?{" "}
               <Anchor
                 component={Link}

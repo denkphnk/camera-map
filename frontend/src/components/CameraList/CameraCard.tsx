@@ -1,5 +1,6 @@
 import {
   Badge,
+  Button,
   Card,
   Group,
   Stack,
@@ -13,6 +14,7 @@ interface CameraCardProps {
   longitude: number;
   camerasCount: number;
   selected?: boolean;
+  onDetails?: () => void;
 }
 
 export function CameraCard({
@@ -22,6 +24,7 @@ export function CameraCard({
   longitude,
   camerasCount,
   selected = false,
+  onDetails,
 }: CameraCardProps) {
   return (
     <Card
@@ -74,6 +77,19 @@ export function CameraCard({
           {" "}
           {longitude.toFixed(5)}
         </Text>
+
+        <Button
+          mt="xs"
+          size="xs"
+          color="violet"
+          variant="light"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDetails?.();
+          }}
+        >
+          Подробнее
+        </Button>
       </Stack>
     </Card>
   );
