@@ -1,4 +1,21 @@
 services:
+  # FRONTEND 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: camera_map_frontend
+
+    ports:
+      - "5173:5173"
+    env_file:
+     - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
   # FastAPI Application
   api:
     build:
