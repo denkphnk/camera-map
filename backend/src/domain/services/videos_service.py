@@ -123,9 +123,6 @@ class VideoService:
         if not camera_exists:
             raise ValueError("Camera not found")
 
-        if not file.content_type or not file.content_type.startswith("video/"):
-            raise ValueError("File must be a video")
-
         uploaded_object_name = None
         uploaded_preview_object_name = None
         temp_path = None
@@ -167,13 +164,17 @@ class VideoService:
 
             uploaded_preview_object_name = preview_data["object_name"]
 
+
+            time_of_day = self._get_time_of_day(name.split('-')[-2].split('_')[-1])
+
+
             video = await self.video_repo.create(
                 {
                     "name": name,
                     "duration": metadata["duration"],
                     "video_resolution": metadata["resolution"],
                     "fps": metadata["fps"],
-                    "time_of_day": "day",
+                    "time_of_day": time_of_day,
                     "tracing": "Run",
                     "author_id": author_id,
                     "counter": 0,
@@ -239,3 +240,17 @@ class VideoService:
             return None
 
         return self.minio_service.get_file(video.preview_object_key)
+
+    def _get_time_of_day(self, time: str) -> str:
+        hour = int(time.split('.')[0])
+        if hour in range(6):
+            return 'night'
+        elif hour in range(5, 12):
+            return 'morning'
+        elif hour in range(11, 18):
+            return 'day'
+        elif hour in range(17, 24):
+            return 'evening'
+        else:
+            raise ValueError('Invalid time format')
+        
