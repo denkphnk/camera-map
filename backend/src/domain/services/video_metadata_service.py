@@ -17,6 +17,12 @@ class VideoMetadataService:
             raise FileNotFoundError(
                 f"Video file not found: {file_path}",
             )
+        
+        with open(file_path, 'rb') as f:
+            header = f.read(32)
+
+            if b"ftyp" not in header:
+                raise ValueError('Invalid mp4 file.')
 
         command = [
             "ffprobe",
@@ -56,6 +62,10 @@ class VideoMetadataService:
             raise ValueError(
                 "Video stream not found",
             )
+
+        format_name = data["format"]["format_name"]
+        if "mp4" not in format_name:
+            raise ValueError("Only mp4 files are allowed")
 
         duration = float(
             data["format"]["duration"],

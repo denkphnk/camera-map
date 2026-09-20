@@ -116,6 +116,11 @@ class VideoService:
         author_id: uuid.UUID,
         camera_id: uuid.UUID
     ) -> Video:
+        suffix = Path(file.filename).suffix.lower()
+        if suffix != '.mp4':
+            raise ValueError('Only .mp4 files are allowed')
+
+        
         author_exists = await self.user_repo.exists_by_id(author_id)
         if not author_exists:
             raise ValueError("Author not found")
