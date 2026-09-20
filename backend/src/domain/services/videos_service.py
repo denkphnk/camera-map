@@ -1,6 +1,7 @@
 import os
 import tempfile
 import uuid
+import re
 from pathlib import Path
 
 from fastapi import UploadFile
@@ -164,8 +165,16 @@ class VideoService:
 
             uploaded_preview_object_name = preview_data["object_name"]
 
-
-            time_of_day = self._get_time_of_day(name.split('-')[-2].split('_')[-1])
+            match = re.search(
+                r"\d{2}\.\d{2}\.\d{4}_(\d{2})\.\d{2}\.\d{2}",
+                name,
+            )
+            if not match:
+                raise ValueError(
+                    "Cannot determine time_of_day from filename"
+                )
+            hour = int(match.group(1))
+            time_of_day = self._get_time_of_day(hour)
 
 
             video = await self.video_repo.create(
@@ -241,16 +250,14 @@ class VideoService:
 
         return self.minio_service.get_file(video.preview_object_key)
 
-    def _get_time_of_day(self, time: str) -> str:
-        hour = int(time.split('.')[0])
-        if hour in range(6):
+    def _get_time_of_day(self, hour: int) -> str:
+        if 0 <= hour < 6:
             return 'night'
-        elif hour in range(5, 12):
+        elif 6 <= hour < 12:
             return 'morning'
-        elif hour in range(11, 18):
+        elif 12 <= hour < 18:
             return 'day'
-        elif hour in range(17, 24):
+        elif 18 <= hour  < 24:
             return 'evening'
-        else:
-            raise ValueError('Invalid time format')
+        raise ValueError('Invalid time format')
         
