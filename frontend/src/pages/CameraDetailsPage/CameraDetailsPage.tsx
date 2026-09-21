@@ -206,7 +206,7 @@ export function CameraDetailsPage() {
                         <Badge
                           color={
                             video.tracing ===
-                            "Done"
+                            "ready"
                               ? "green"
                               : "yellow"
                           }

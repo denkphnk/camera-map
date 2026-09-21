@@ -218,7 +218,7 @@ export function ProfilePage() {
             <Badge
               color={
                 video.tracing ===
-                "Done"
+                "ready"
                   ? "green"
                   : "yellow"
               }

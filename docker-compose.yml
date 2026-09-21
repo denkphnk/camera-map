@@ -126,27 +126,9 @@ services:
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
     volumes:
-      - ./src:/app/src
-      - ./migrations:/app/migrations
+      - ./backend/src:/app/src
+      - ./backend/migrations:/app/migrations
     command: celery -A src.celery_app worker --pool=custom --loglevel=info --concurrency=10
-
-  # Celery Beat (Scheduler)
-  celery_beat:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    platform: linux/arm64
-    container_name: camera_map_beat
-    depends_on:
-      - redis
-      - rabbitmq
-    environment:
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=amqp://admin:admin@rabbitmq:5672//
-      - CELERY_RESULT_BACKEND=redis://redis:6379/1
-    volumes:
-      - ./src:/app/src
-    command: celery -A src.celery_app beat --loglevel=info
 
   # Flower (Celery Monitoring)
   flower:
@@ -166,7 +148,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/1
     working_dir: /app
     volumes:
-    - ./src:/app/src
+    - ./backend/src:/app/src
     command: celery -A src.celery_app flower --port=5555
 
   # MinIO (S3-compatible Object Storage)
