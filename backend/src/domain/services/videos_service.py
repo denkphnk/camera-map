@@ -7,6 +7,7 @@ from fastapi import UploadFile
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.config import settings
 from src.domain.schemas.video_schemas import VideoDetailsResponse, VideoResponse
 from src.data.models.video_model import Video
 from src.data.repositories.video_repository import VideoRepository
@@ -198,8 +199,8 @@ class VideoService:
 
         return VideoDetailsResponse(
             **VideoResponse.model_validate(video).model_dump(),
-            video_url=f"http://localhost:8000/videos/{video.id}/stream",
-            preview_url=f"http://localhost:8000/videos/{video.id}/preview",
+            video_url=f"http://{settings.BASE_URL}/videos/{video.id}/stream",
+            preview_url=f"http://{settings.BASE_URL}/videos/{video.id}/preview",
         )
 
     async def get_video_file(self, video_id: uuid.UUID) -> tuple[bytes, str] | None:

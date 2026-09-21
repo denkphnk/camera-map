@@ -6,7 +6,7 @@ from src.api.v1.users.user_schemas import UserProfileResponse, UserUpdateRequest
 
 from src.api.v1.dependencies import get_user_service, get_current_user
 
-user_router = APIRouter(prefix="/users", tags=["Users"])
+user_router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 
 @user_router.get("/me", response_model=UserProfileResponse)

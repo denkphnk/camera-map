@@ -10,7 +10,7 @@ from src.api.v1.camera.camera_schemas import (
 from src.api.v1.dependencies import get_camera_service
 from src.domain.services.camera_service import CameraService
 
-camera_router = APIRouter(prefix="/cameras", tags=["Camera"])
+camera_router = APIRouter(prefix="/api/v1/cameras", tags=["Camera"])
 
 
 @camera_router.get("/", response_model=list[CameraResponse])

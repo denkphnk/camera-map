@@ -13,8 +13,9 @@ from src.api.v1.videos.videos_schemas import (
 )
 from src.api.v1.dependencies import get_current_user, get_video_service
 from src.domain.services.videos_service import VideoService
+from src.core.config import settings
 
-videos_router = APIRouter(prefix="/videos", tags=["Video"])
+videos_router = APIRouter(prefix="/api/v1/videos", tags=["Video"])
 
 
 @videos_router.get("/", response_model=VideoListResponse)
@@ -43,8 +44,8 @@ async def get_my_videos(
         items=[
             VideoDetailsResponse(
                 **VideoResponse.model_validate(video).model_dump(),
-                video_url=f"http://localhost:8000/videos/{video.id}/stream",
-                preview_url=f"http://localhost:8000/videos/{video.id}/preview",
+                video_url=f"http://{settings.BASE_URL}/api/v1/videos/{video.id}/stream",
+                preview_url=f"http://{settings.BASE_URL}/api/v1/videos/{video.id}/preview",
             )
             for video in videos
         ],

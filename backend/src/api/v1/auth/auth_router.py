@@ -10,7 +10,7 @@ from src.api.v1.auth.auth_schemas import (
 from src.api.v1.dependencies import get_auth_service
 from src.domain.services.auth_service import AuthService
 
-auth_router = APIRouter(prefix="/auth", tags=["Auth"])
+auth_router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
 
 
 @auth_router.post("/register", response_model=UserResponse)
