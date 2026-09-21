@@ -17,12 +17,12 @@ class VideoMetadataService:
             raise FileNotFoundError(
                 f"Video file not found: {file_path}",
             )
-        
-        with open(file_path, 'rb') as f:
+
+        with open(file_path, "rb") as f:
             header = f.read(32)
 
             if b"ftyp" not in header:
-                raise ValueError('Invalid mp4 file.')
+                raise ValueError("Invalid mp4 file.")
 
         command = [
             "ffprobe",
@@ -50,11 +50,7 @@ class VideoMetadataService:
         data = json.loads(result.stdout)
 
         video_stream = next(
-            (
-                stream
-                for stream in data["streams"]
-                if stream["codec_type"] == "video"
-            ),
+            (stream for stream in data["streams"] if stream["codec_type"] == "video"),
             None,
         )
 
@@ -74,18 +70,14 @@ class VideoMetadataService:
         width = video_stream["width"]
         height = video_stream["height"]
 
-        resolution = (
-            f"{width}x{height}"
-        )
+        resolution = f"{width}x{height}"
 
         fps_raw = video_stream.get(
             "avg_frame_rate",
             "0/1",
         )
 
-        numerator, denominator = (
-            fps_raw.split("/")
-        )
+        numerator, denominator = fps_raw.split("/")
 
         try:
             denominator_value = float(
@@ -96,8 +88,7 @@ class VideoMetadataService:
                 fps = 0
             else:
                 fps = round(
-                    float(numerator)
-                    / denominator_value,
+                    float(numerator) / denominator_value,
                     2,
                 )
 

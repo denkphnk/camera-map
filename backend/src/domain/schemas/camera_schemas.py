@@ -4,6 +4,7 @@ from datetime import datetime
 
 from src.domain.schemas.video_schemas import VideoResponse
 
+
 class CameraSearchFilters(BaseModel):
     search: str | None
     model: str | None
@@ -11,6 +12,7 @@ class CameraSearchFilters(BaseModel):
     camera_class: str | None
     video_count_from: int | None
     video_count_to: int | None
+
 
 class CameraResponse(BaseModel):
     id: UUID
@@ -42,10 +44,10 @@ class CameraResponse(BaseModel):
         from_attributes=True,
     )
 
+
 class CameraDetailsResponse(BaseModel):
     camera: CameraResponse
     videos: list[VideoResponse]
     total: int
 
     model_config = ConfigDict(from_attributes=True)
-    

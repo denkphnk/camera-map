@@ -10,6 +10,7 @@ from src.celery_app import celery_app
 from src.data.repositories.video_repository import VideoRepository
 from src.domain.services.video_metadata_service import VideoMetadataService
 
+
 @celery_app.task(bind=True)
 async def process_video(self, video_id: uuid.UUID):
     async with AsyncSessionLocal() as session:
@@ -29,16 +30,13 @@ async def process_video(self, video_id: uuid.UUID):
             if video is None:
                 return
 
-            exists_processing_video = await video_repo.exists_processing_video(video.author_id, video_id)
+            exists_processing_video = await video_repo.exists_processing_video(
+                video.author_id, video_id
+            )
             if exists_processing_video:
                 return
 
-            await video_repo.update(
-                video.id,
-                {
-                    "tracing": "processing"
-                }
-            )
+            await video_repo.update(video.id, {"tracing": "processing"})
             await session.commit()
 
             with tempfile.NamedTemporaryFile(
@@ -76,7 +74,7 @@ async def process_video(self, video_id: uuid.UUID):
                     "fps": metadata["fps"],
                     "tracing": "ready",
                     "preview_object_key": uploaded_preview_object_name,
-                }
+                },
             )
 
             await session.commit()

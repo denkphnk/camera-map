@@ -24,6 +24,7 @@ async def get_me(
 
     return profile
 
+
 @user_router.patch("/me", response_model=UserProfileResponse)
 async def update_me(
     data: UserUpdateRequest,

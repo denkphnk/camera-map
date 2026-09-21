@@ -12,12 +12,11 @@ class UserService:
         self.user_repo = UserRepository(session)
         self.video_repo = VideoRepository(session)
 
-
     async def get_me(self, user_id: UUID) -> UserProfileResponse | None:
         user = await self.user_repo.get_by_id(user_id)
         if user is None:
             return None
-        
+
         videos, total = await self.video_repo.get_by_author(user_id)
 
         return UserProfileResponse(
@@ -25,13 +24,15 @@ class UserService:
             email=user.email,
             full_name=user.full_name,
             videos=videos,
-            total_videos=total
+            total_videos=total,
         )
 
-    async def update_me(self, user_id: UUID, data: UserUpdateRequest) -> UserProfileResponse | None:
+    async def update_me(
+        self, user_id: UUID, data: UserUpdateRequest
+    ) -> UserProfileResponse | None:
         if not data.model_dump(exclude_unset=True):
-            raise ValueError('No fields to update')
-        
+            raise ValueError("No fields to update")
+
         user = await self.user_repo.update(user_id, data.model_dump(exclude_unset=True))
         if user is None:
             return None
@@ -46,5 +47,5 @@ class UserService:
             email=user.email,
             full_name=user.full_name,
             videos=videos,
-            total_videos=total
+            total_videos=total,
         )

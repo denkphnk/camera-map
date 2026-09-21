@@ -8,7 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.data.models.camera_model import DCamera
 from src.data.repositories.camera_repository import CameraRepository
 from src.data.repositories.video_repository import VideoRepository
-from src.domain.schemas.camera_schemas import CameraSearchFilters, CameraDetailsResponse, CameraResponse
+from src.domain.schemas.camera_schemas import (
+    CameraSearchFilters,
+    CameraDetailsResponse,
+    CameraResponse,
+)
 
 
 logger = logging.getLogger(__name__)

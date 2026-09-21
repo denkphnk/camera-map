@@ -1,4 +1,4 @@
-from sqlalchemy import func, or_, select, join
+from sqlalchemy import func, or_, select
 
 
 from src.data.models.video_model import Video
@@ -34,8 +34,8 @@ class CameraRepository(BaseRepository[DCamera]):
         return result.all()
 
     async def search(
-    self,
-    filters: CameraSearchFilters,
+        self,
+        filters: CameraSearchFilters,
     ):
         video_count = func.count(
             Video.id,
@@ -56,44 +56,27 @@ class CameraRepository(BaseRepository[DCamera]):
         )
 
         if filters.search:
-            query = query.where(
-                self.model.camera_name.ilike(
-                    f"%{filters.search}%"
-                )
-            )
+            query = query.where(self.model.camera_name.ilike(f"%{filters.search}%"))
 
         if filters.model:
-            query = query.where(
-                self.model.model == filters.model
-            )
+            query = query.where(self.model.model == filters.model)
 
         if filters.camera_type:
-            query = query.where(
-                self.model.camera_type
-                == filters.camera_type
-            )
+            query = query.where(self.model.camera_type == filters.camera_type)
 
         if filters.search:
             query = query.where(
                 or_(
-                    self.model.camera_id.ilike(
-                        f"%{filters.search}%"
-                    ),
-                    self.model.camera_name.ilike(
-                        f"%{filters.search}%"
-                    ),
+                    self.model.camera_id.ilike(f"%{filters.search}%"),
+                    self.model.camera_name.ilike(f"%{filters.search}%"),
                 )
             )
 
         if filters.video_count_from is not None:
-            query = query.having(
-                video_count >= filters.video_count_from
-            )
+            query = query.having(video_count >= filters.video_count_from)
 
         if filters.video_count_to is not None:
-            query = query.having(
-                video_count <= filters.video_count_to
-            )
+            query = query.having(video_count <= filters.video_count_to)
 
         result = await self.session.execute(
             query,

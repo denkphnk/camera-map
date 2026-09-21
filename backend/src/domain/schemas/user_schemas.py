@@ -10,7 +10,7 @@ class UserProfileResponse(BaseModel):
     full_name: str
     videos: list[VideoResponse]
     total_videos: int
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

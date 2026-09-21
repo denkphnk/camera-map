@@ -27,6 +27,7 @@ class VideoResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class VideoSearchFilters(BaseModel):
     name: str | None = None
     author_id: UUID | None = None
@@ -43,9 +44,11 @@ class VideoListResponse(BaseModel):
     items: list[VideoResponse]
     total: int
 
+
 class VideoDetailsResponse(VideoResponse):
     video_url: str
     preview_url: str | None
+
 
 class VideoDetailsListResponse(BaseModel):
     items: list[VideoDetailsResponse]

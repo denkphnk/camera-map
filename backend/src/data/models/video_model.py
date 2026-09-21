@@ -53,7 +53,7 @@ class Video(Base):
         nullable=False,
         index=True,
     )
-    
+
     camera_id: Mapped[uuid.UUID] = mapped_column(
         PGUUID(as_uuid=True),
         ForeignKey("d_camera.id"),
@@ -84,9 +84,7 @@ class Video(Base):
     )
 
     preview_object_key: Mapped[str] = mapped_column(
-        String(500),
-        nullable=True,
-        unique=True
+        String(500), nullable=True, unique=True
     )
 
     created_at: Mapped[datetime] = mapped_column(

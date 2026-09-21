@@ -18,6 +18,7 @@ from src.domain.services.videos_service import VideoService
 
 security = HTTPBearer()
 
+
 async def get_auth_service(
     session: AsyncSession = Depends(get_db),
 ) -> AuthService:
@@ -33,24 +34,27 @@ async def get_camera_service(
 def get_minio_service() -> MinioService:
     return MinioService()
 
+
 async def get_video_service(
-    session: AsyncSession = Depends(get_db), minio_service: MinioService = Depends(get_minio_service), redis: Redis = Depends(get_redis)
+    session: AsyncSession = Depends(get_db),
+    minio_service: MinioService = Depends(get_minio_service),
+    redis: Redis = Depends(get_redis),
 ) -> VideoService:
     return VideoService(session=session, minio_service=minio_service, redis=redis)
+
 
 async def get_user_service(
     session: AsyncSession = Depends(get_db),
 ) -> UserService:
     return UserService(session)
 
+
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     session: AsyncSession = Depends(get_db),
 ) -> User:
     try:
-        user_id = TokenService(settings).decode_access_token(
-            credentials.credentials
-        )
+        user_id = TokenService(settings).decode_access_token(credentials.credentials)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

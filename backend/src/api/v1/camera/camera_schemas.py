@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 from src.api.v1.videos.videos_schemas import VideoResponse
 
+
 class CameraSearchFilters(BaseModel):
     search: str | None = None
     model: str | None = None
@@ -51,4 +52,3 @@ class CameraDetailsResponse(BaseModel):
     total: int
 
     model_config = ConfigDict(from_attributes=True)
-    

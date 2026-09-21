@@ -27,6 +27,7 @@ class VideoResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class VideoSearchFilters(BaseModel):
     name: str | None = None
     author_id: UUID | None = None

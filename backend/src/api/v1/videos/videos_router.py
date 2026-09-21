@@ -9,7 +9,7 @@ from src.api.v1.videos.videos_schemas import (
     VideoResponse,
     VideoSearchFilters,
     VideoDetailsResponse,
-    VideoDetailsListResponse
+    VideoDetailsListResponse,
 )
 from src.api.v1.dependencies import get_current_user, get_video_service
 from src.domain.services.videos_service import VideoService
@@ -28,6 +28,7 @@ async def get_videos(
     )
 
     return VideoListResponse(items=videos, total=total)
+
 
 @videos_router.get("/me", response_model=VideoDetailsListResponse)
 async def get_my_videos(
@@ -51,6 +52,7 @@ async def get_my_videos(
         ],
         total=total,
     )
+
 
 @videos_router.get("/author/{author_id}", response_model=VideoListResponse)
 async def get_videos_by_author(
@@ -93,13 +95,16 @@ async def get_video_details(
     return video
 
 
-@videos_router.delete('/{video_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_video(video_id: UUID, service: VideoService = Depends(get_video_service)):
+@videos_router.delete("/{video_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_video(
+    video_id: UUID, service: VideoService = Depends(get_video_service)
+):
     deleted = await service.delete_video(video_id)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Video not found"
         )
+
 
 @videos_router.post(
     "/upload",
@@ -127,6 +132,7 @@ async def upload_video(
             detail=str(e),
         )
 
+
 @videos_router.get("/{video_id}/stream")
 async def stream_video(
     video_id: UUID,
@@ -147,6 +153,7 @@ async def stream_video(
         media_type=content_type,
     )
 
+
 @videos_router.get("/{video_id}/preview")
 async def get_preview(
     video_id: UUID,
@@ -164,4 +171,3 @@ async def get_preview(
         io.BytesIO(preview),
         media_type="image/jpeg",
     )
-

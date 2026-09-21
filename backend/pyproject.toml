@@ -73,3 +73,6 @@ ignore = [
     "B008",
     "BLE001",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/*.py" = ["ALL"]

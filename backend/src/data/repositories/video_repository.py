@@ -39,7 +39,7 @@ class VideoRepository(BaseRepository[Video]):
         videos = (
             select(self.model)
             .where(self.model.camera_id == camera_id)
-            .order_by(self.model.created_at.desc() )
+            .order_by(self.model.created_at.desc())
         )
         total = (
             select(func.count())
@@ -54,63 +54,39 @@ class VideoRepository(BaseRepository[Video]):
         return result.scalars().all(), result_total.scalar_one()
 
     async def search(
-    self,
-    name: str | None = None,
-    author_id: Any | None = None,
-    offset: int = 0,
-    limit: int = 20,
+        self,
+        name: str | None = None,
+        author_id: Any | None = None,
+        offset: int = 0,
+        limit: int = 20,
     ):
-        query = (
-            select(
-                Video,
-                User.full_name.label("author_name"),
-            )
-            .join(
-                User,
-                User.id == Video.author_id,
-            )
+        query = select(
+            Video,
+            User.full_name.label("author_name"),
+        ).join(
+            User,
+            User.id == Video.author_id,
         )
 
-        total_query = select(
-            func.count()
-        ).select_from(Video)
+        total_query = select(func.count()).select_from(Video)
 
         if name and name.strip():
             pattern = f"%{name}%"
 
-            query = query.where(
-                Video.name.ilike(pattern)
-            )
+            query = query.where(Video.name.ilike(pattern))
 
-            total_query = total_query.where(
-                Video.name.ilike(pattern)
-            )
+            total_query = total_query.where(Video.name.ilike(pattern))
 
         if author_id:
-            query = query.where(
-                Video.author_id == author_id
-            )
+            query = query.where(Video.author_id == author_id)
 
-            total_query = total_query.where(
-                Video.author_id == author_id
-            )
+            total_query = total_query.where(Video.author_id == author_id)
 
-        query = (
-            query
-            .order_by(Video.created_at.desc())
-            .offset(offset)
-            .limit(limit)
-        )
+        query = query.order_by(Video.created_at.desc()).offset(offset).limit(limit)
 
-        result = await self.session.execute(
-            query
-        )
+        result = await self.session.execute(query)
 
-        total_result = (
-            await self.session.execute(
-                total_query
-            )
-        )
+        total_result = await self.session.execute(total_query)
 
         videos = []
 
@@ -122,7 +98,7 @@ class VideoRepository(BaseRepository[Video]):
             videos,
             total_result.scalar_one(),
         )
-    
+
     async def increment_counter(self, video_id: Any) -> Video | None:
         query = (
             update(self.model)
@@ -143,8 +119,8 @@ class VideoRepository(BaseRepository[Video]):
             select(self.model)
             .where(
                 self.model.author_id == author_id,
-                self.model.tracing == 'processing',
-                self.model.id != exclude_video_id
+                self.model.tracing == "processing",
+                self.model.id != exclude_video_id,
             )
             .order_by(self.model.created_at.desc())
             .limit(1)
@@ -159,10 +135,7 @@ class VideoRepository(BaseRepository[Video]):
     ) -> Video | None:
         query = (
             select(self.model)
-            .where(
-                self.model.author_id == author_id,
-                self.model.tracing == 'queued'
-            )
+            .where(self.model.author_id == author_id, self.model.tracing == "queued")
             .order_by(self.model.created_at.asc())
             .limit(1)
         )

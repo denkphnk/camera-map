@@ -19,10 +19,7 @@ from src.tasks.video_tasks import process_video
 
 class VideoService:
     def __init__(
-        self,
-        session: AsyncSession,
-        minio_service: MinioService,
-        redis: Redis
+        self, session: AsyncSession, minio_service: MinioService, redis: Redis
     ):
         self.session = session
         self.redis = redis
@@ -86,7 +83,6 @@ class VideoService:
         if not video:
             return False
 
-
         deleted = await self.video_repo.delete(video_id)
 
         if deleted:
@@ -104,19 +100,14 @@ class VideoService:
 
             await self.redis.delete("cameras:geojson")
 
-
         return deleted
 
     async def upload_video(
-        self,
-        file: UploadFile,
-        name: str,
-        author_id: uuid.UUID,
-        camera_id: uuid.UUID
+        self, file: UploadFile, name: str, author_id: uuid.UUID, camera_id: uuid.UUID
     ) -> Video:
         suffix = Path(file.filename or "").suffix.lower()
-        if suffix != '.mp4':
-            raise ValueError('Only .mp4 files are allowed')
+        if suffix != ".mp4":
+            raise ValueError("Only .mp4 files are allowed")
 
         author_exists = await self.user_repo.exists_by_id(author_id)
         if not author_exists:
@@ -131,7 +122,7 @@ class VideoService:
         contents = await file.read()
         if not contents:
             raise ValueError("Empty file")
-        
+
         try:
             await file.seek(0)
             file_uuid = uuid.uuid4()
@@ -148,12 +139,9 @@ class VideoService:
                 name,
             )
             if not match:
-                raise ValueError(
-                    "Cannot determine time_of_day from filename"
-                )
+                raise ValueError("Cannot determine time_of_day from filename")
             hour = int(match.group(1))
             time_of_day = self._get_time_of_day(hour)
-
 
             video = await self.video_repo.create(
                 {
@@ -169,7 +157,7 @@ class VideoService:
                     "file_size": len(contents),
                     "content_type": file.content_type,
                     "preview_object_key": "",
-                    "camera_id": camera_id
+                    "camera_id": camera_id,
                 }
             )
 
@@ -180,7 +168,6 @@ class VideoService:
 
             await self.redis.delete("cameras:geojson")
 
-
             return video
 
         except Exception:
@@ -190,8 +177,9 @@ class VideoService:
 
             raise
 
-
-    async def get_video_details(self, video_id: uuid.UUID) -> VideoDetailsResponse | None:
+    async def get_video_details(
+        self, video_id: uuid.UUID
+    ) -> VideoDetailsResponse | None:
         video = await self.video_repo.get_by_id(video_id)
 
         if video is None:
@@ -223,12 +211,11 @@ class VideoService:
 
     def _get_time_of_day(self, hour: int) -> str:
         if 0 <= hour < 6:
-            return 'night'
+            return "night"
         elif 6 <= hour < 12:
-            return 'morning'
+            return "morning"
         elif 12 <= hour < 18:
-            return 'day'
-        elif 18 <= hour  < 24:
-            return 'evening'
-        raise ValueError('Invalid time format')
-        
+            return "day"
+        elif 18 <= hour < 24:
+            return "evening"
+        raise ValueError("Invalid time format")
