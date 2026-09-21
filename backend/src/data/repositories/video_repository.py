@@ -133,3 +133,39 @@ class VideoRepository(BaseRepository[Video]):
 
         video = await self.session.execute(query)
         return video.scalar_one_or_none()
+
+    async def exists_processing_video(
+        self,
+        author_id: Any,
+        exclude_video_id: Any,
+    ) -> bool:
+        query = (
+            select(self.model)
+            .where(
+                self.model.author_id == author_id,
+                self.model.tracing == 'processing',
+                self.model.id != exclude_video_id
+            )
+            .order_by(self.model.created_at.desc())
+            .limit(1)
+        )
+
+        video = await self.session.execute(query)
+        return bool(video.scalar_one_or_none())
+
+    async def get_next_queued_video(
+        self,
+        author_id,
+    ) -> Video | None:
+        query = (
+            select(self.model)
+            .where(
+                self.model.author_id == author_id,
+                self.model.tracing == 'queued'
+            )
+            .order_by(self.model.created_at.asc())
+            .limit(1)
+        )
+
+        video = await self.session.execute(query)
+        return video.scalar_one_or_none()

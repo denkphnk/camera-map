@@ -8,9 +8,9 @@ class VideoResponse(BaseModel):
     id: UUID
     name: str
 
-    duration: float
-    video_resolution: str
-    fps: float
+    duration: float | None
+    video_resolution: str | None
+    fps: float | None
 
     time_of_day: str
     tracing: str
@@ -41,4 +41,4 @@ class VideoListResponse(BaseModel):
 
 class VideoDetailsResponse(VideoResponse):
     video_url: str
-    preview_url: str
+    preview_url: str | None

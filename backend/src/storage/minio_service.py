@@ -123,3 +123,22 @@ class MinioService:
 
         except S3Error as e:
             raise ValueError(f"Failed to get file: {e}") from e
+
+    def download_file(self, object_name: str, file_path: str):
+        response = None
+        try:
+            response = self.client.get_object(
+                self.bucket_name,
+                object_name,
+            )
+
+            with open(file_path, "wb") as file:
+                file.write(response.read())
+
+        except S3Error as e:
+            raise ValueError(f"Failed to download file: {e}") from e
+
+        finally:
+            if response:
+                response.close()
+                response.release_conn()

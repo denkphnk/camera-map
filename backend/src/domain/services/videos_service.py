@@ -1,5 +1,3 @@
-import os
-import tempfile
 import uuid
 import re
 from pathlib import Path
@@ -9,13 +7,13 @@ from fastapi import UploadFile
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.domain.services.video_metadata_service import VideoMetadataService
 from src.domain.schemas.video_schemas import VideoDetailsResponse, VideoResponse
 from src.data.models.video_model import Video
 from src.data.repositories.video_repository import VideoRepository
 from src.data.repositories.user_repository import UserRepository
 from src.data.repositories.camera_repository import CameraRepository
 from src.storage.minio_service import MinioService
+from src.tasks.video_tasks import process_video
 
 
 class VideoService:
@@ -31,7 +29,6 @@ class VideoService:
         self.user_repo = UserRepository(session)
         self.camera_repo = CameraRepository(session)
         self.minio_service = minio_service
-        self.video_metadata_service = VideoMetadataService()
 
     async def get_video_by_id(self, video_id: uuid.UUID) -> Video | None:
         return await self.video_repo.get_by_id(video_id)
@@ -116,11 +113,10 @@ class VideoService:
         author_id: uuid.UUID,
         camera_id: uuid.UUID
     ) -> Video:
-        suffix = Path(file.filename).suffix.lower()
+        suffix = Path(file.filename or "").suffix.lower()
         if suffix != '.mp4':
             raise ValueError('Only .mp4 files are allowed')
 
-        
         author_exists = await self.user_repo.exists_by_id(author_id)
         if not author_exists:
             raise ValueError("Author not found")
@@ -130,45 +126,21 @@ class VideoService:
             raise ValueError("Camera not found")
 
         uploaded_object_name = None
-        uploaded_preview_object_name = None
-        temp_path = None
-        preview_path = None
-        suffix = Path(file.filename or "").suffix
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-            contents = await file.read()
-            if not contents:
-                raise ValueError("Empty file")
-            temp_file.write(contents)
-            temp_path = temp_file.name
-
+        contents = await file.read()
+        if not contents:
+            raise ValueError("Empty file")
+        
         try:
-            metadata = self.video_metadata_service.get_metadata(temp_path)
             await file.seek(0)
             file_uuid = uuid.uuid4()
             object_key = f"videos/{file_uuid}{suffix}"
-            preview_object_key = f"previews/{file_uuid}.jpg"
-
-            preview_path = f"{temp_path}.jpg"
-
-            self.video_metadata_service.extract_first_frame(
-                video_path=temp_path,
-                output_path=preview_path,
-            )
 
             minio_data = await self.minio_service.upload_file(
                 file=file,
                 object_name=object_key,
             )
             uploaded_object_name = minio_data["object_name"]
-
-            preview_data = self.minio_service.upload_local_file(
-                file_path=preview_path,
-                object_name=preview_object_key,
-                content_type="image/jpeg",
-            )
-
-            uploaded_preview_object_name = preview_data["object_name"]
 
             match = re.search(
                 r"\d{2}\.\d{2}\.\d{4}_(\d{2})\.\d{2}\.\d{2}",
@@ -185,23 +157,25 @@ class VideoService:
             video = await self.video_repo.create(
                 {
                     "name": name,
-                    "duration": metadata["duration"],
-                    "video_resolution": metadata["resolution"],
-                    "fps": metadata["fps"],
+                    "duration": 0,
+                    "video_resolution": "",
+                    "fps": 0,
                     "time_of_day": time_of_day,
-                    "tracing": "Run",
+                    "tracing": "queued",
                     "author_id": author_id,
                     "counter": 0,
                     "file_object_key": uploaded_object_name,
                     "file_size": len(contents),
                     "content_type": file.content_type,
-                    "preview_object_key": uploaded_preview_object_name,
+                    "preview_object_key": "",
                     "camera_id": camera_id
                 }
             )
 
             await self.session.commit()
             await self.session.refresh(video)
+
+            process_video.delay(str(video.id))
 
             await self.redis.delete("cameras:geojson")
 
@@ -213,16 +187,7 @@ class VideoService:
             if uploaded_object_name:
                 self.minio_service.delete_file(uploaded_object_name)
 
-            if uploaded_preview_object_name:
-                self.minio_service.delete_file(uploaded_preview_object_name)
             raise
-
-        finally:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-
-            if preview_path and os.path.exists(preview_path):
-                os.remove(preview_path)
 
 
     async def get_video_details(self, video_id: uuid.UUID) -> VideoDetailsResponse | None:

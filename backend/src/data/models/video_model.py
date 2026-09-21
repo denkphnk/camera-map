@@ -24,17 +24,17 @@ class Video(Base):
 
     duration: Mapped[float] = mapped_column(
         Float,
-        nullable=False,
+        nullable=True,
     )
 
     video_resolution: Mapped[str] = mapped_column(
         String(50),
-        nullable=False,
+        nullable=True,
     )
 
     fps: Mapped[float] = mapped_column(
         Float,
-        nullable=False,
+        nullable=True,
     )
 
     time_of_day: Mapped[str] = mapped_column(
@@ -45,7 +45,6 @@ class Video(Base):
     tracing: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
-        default="Run",
     )
 
     author_id: Mapped[uuid.UUID] = mapped_column(
@@ -86,7 +85,7 @@ class Video(Base):
 
     preview_object_key: Mapped[str] = mapped_column(
         String(500),
-        nullable=False,
+        nullable=True,
         unique=True
     )
 

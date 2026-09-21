@@ -6,7 +6,7 @@ celery_app = Celery(
     "camera_map",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
-    # include=["src.tasks.video_tasks"],  # Пока нет задач — просто закомментируй
+    include=["src.tasks.video_tasks"],
 )
 
 celery_app.conf.update(
@@ -19,4 +19,6 @@ celery_app.conf.update(
     task_time_limit=30 * 60,
     task_soft_time_limit=25 * 60,
     result_expires=3600,
+    worker_prefetch_multiplier=1,
+    task_acks_late=True,
 )
