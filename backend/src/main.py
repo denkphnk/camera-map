@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.api.v1.analysis.analysis_router import analysis_router
 from src.api.v1.auth.auth_router import auth_router
 from src.api.v1.camera.camera_router import camera_router
 from src.api.v1.videos.videos_router import videos_router
@@ -44,6 +45,7 @@ app.add_middleware(
 
 app.add_exception_handler(ValueError, value_error_handler)
 
+app.include_router(analysis_router)
 app.include_router(auth_router)
 app.include_router(camera_router)
 app.include_router(videos_router)

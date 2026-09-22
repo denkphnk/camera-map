@@ -11,12 +11,19 @@ from src.core.cache import get_redis
 from src.core.config import settings
 from src.core.database import get_db
 from src.storage.minio_service import MinioService
+from src.domain.services.analysis_service import AnalysisService
 from src.domain.services.auth_service import AuthService
 from src.domain.services.camera_service import CameraService
 from src.domain.services.videos_service import VideoService
 
 
 security = HTTPBearer()
+
+
+async def get_analysis_service(
+    session: AsyncSession = Depends(get_db),
+) -> AnalysisService:
+    return AnalysisService(session)
 
 
 async def get_auth_service(
