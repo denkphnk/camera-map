@@ -11,6 +11,7 @@ import {
   IconMap2,
   IconUser,
   IconVideo,
+  IconChartBar,
 } from "@tabler/icons-react";
 
 import {
@@ -93,6 +94,26 @@ export function Sidebar() {
             radius="md"
           >
             <IconVideo size={20} />
+          </ActionIcon>
+        </Tooltip>
+
+        <Tooltip
+          label="Аналитика"
+          position="right"
+        >
+          <ActionIcon
+            component={NavLink}
+            to="/analysis"
+            color="violet"
+            variant={
+              isActive("/analysis")
+                ? "filled"
+                : "subtle"
+            }
+            size={40}
+            radius="md"
+          >
+            <IconChartBar size={20} />
           </ActionIcon>
         </Tooltip>
       </Stack>
