@@ -3,7 +3,7 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, func
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.database import Base
 
@@ -92,3 +92,6 @@ class Video(Base):
         nullable=False,
         server_default=func.now(),
     )
+
+
+    analyses = relationship("AnalysisModel", back_populates="video")
