@@ -11,10 +11,12 @@ from src.core.config import settings
 from src.domain.schemas.video_schemas import VideoDetailsResponse, VideoResponse
 from src.data.models.video_model import Video
 from src.data.repositories.video_repository import VideoRepository
+from src.data.repositories.analysis_repository import AnalysisRepository
 from src.data.repositories.user_repository import UserRepository
 from src.data.repositories.camera_repository import CameraRepository
 from src.storage.minio_service import MinioService
 from src.tasks.video_tasks import process_video
+from src.tasks.analysis_tasks import run_analysis_task
 
 
 class VideoService:
@@ -24,6 +26,7 @@ class VideoService:
         self.session = session
         self.redis = redis
         self.video_repo = VideoRepository(session)
+        self.analysis_repo = AnalysisRepository(session)
         self.user_repo = UserRepository(session)
         self.camera_repo = CameraRepository(session)
         self.minio_service = minio_service
@@ -136,7 +139,7 @@ class VideoService:
 
             match = re.search(
                 r"\d{2}\.\d{2}\.\d{4}_(\d{2})\.\d{2}\.\d{2}",
-                name,
+                file.filename,
             )
             if not match:
                 raise ValueError("Cannot determine time_of_day from filename")
@@ -161,10 +164,13 @@ class VideoService:
                 }
             )
 
+            analysis = await self.analysis_repo.create({"video_id": video.id})
+
             await self.session.commit()
             await self.session.refresh(video)
 
             process_video.delay(str(video.id))
+            run_analysis_task.delay(str(analysis.id))
 
             await self.redis.delete("cameras:geojson")
 

@@ -15,8 +15,8 @@ async def get_all_analyses(
     filters: AnalysisFilters = Depends(),
     service: AnalysisService = Depends(get_analysis_service)
 ):
-    analyses = await service.get_all(offset, limit, filters)
-    return analyses
+    analyses = await service.get_all(filters, offset, limit)
+    return AnalysisListResponse(items=analyses)
 
 
 @analysis_router.get("/{analysis_id}", response_model=AnalysisResponse)

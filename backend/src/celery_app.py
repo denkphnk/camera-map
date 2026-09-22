@@ -6,7 +6,10 @@ celery_app = Celery(
     "camera_map",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
-    include=["src.tasks.video_tasks"],
+    include=[
+        "src.tasks.video_tasks",
+        "src.tasks.analysis_tasks",
+    ],
 )
 
 celery_app.conf.update(
