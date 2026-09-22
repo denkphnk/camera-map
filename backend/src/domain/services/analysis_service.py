@@ -7,7 +7,7 @@ from random import randint
 from src.data.models.analysis_model import Analysis
 from src.data.repositories.analysis_repository import AnalysisRepository
 from src.data.repositories.video_repository import VideoRepository
-from src.domain.schemas.analysis_schemas import AnalysisFilters
+from src.domain.schemas.analysis_schemas import AnalysisFilters, AnalysisResponse
 
 
 class AnalysisService:
@@ -25,8 +25,26 @@ class AnalysisService:
         return analysis
 
     async def get_all(self, filters: AnalysisFilters, offset: int = 0, limit: int = 20) -> list[Analysis]:
-        analyses = await self.analysis_repo.get_all(offset, limit, **filters.model_dump(exclude_none=True))
-        return analyses
+        items = []
+        rows = await self.analysis_repo.get_all(offset, limit, **filters.model_dump(exclude_none=True))
+
+        for analysis, video_name, camera_name in rows:
+            items.append(
+                AnalysisResponse(
+                    id=analysis.id,
+                    video_id=analysis.video_id,
+                    status=analysis.status,
+                    result=analysis.result,
+                    error_message=analysis.error_message,
+                    created_at=analysis.created_at,
+                    started_at=analysis.started_at,
+                    finished_at=analysis.finished_at,
+                    video_name=video_name,
+                    camera_name=camera_name,
+                )
+            )
+
+        return items
 
     async def create(self, video_id: UUID) -> Analysis:
         exists = await self.video_repo.get_by_id(video_id)

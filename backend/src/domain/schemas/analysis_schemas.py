@@ -9,6 +9,8 @@ from uuid import UUID
 class AnalysisResponse(BaseModel):
     id: UUID
     video_id: UUID
+    video_name: str
+    camera_name: str
     status: AnalysisStatus
     result: dict | None
     error_message: str | None

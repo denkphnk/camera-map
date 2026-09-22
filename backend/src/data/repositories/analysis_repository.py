@@ -5,6 +5,7 @@ from sqlalchemy import select, update, func
 from src.data.repositories.base_repository import BaseRepository
 from src.data.models.analysis_model import Analysis, AnalysisStatus
 from src.data.models.video_model import Video
+from src.data.models.camera_model import DCamera
 
 class AnalysisRepository(BaseRepository[Analysis]):
     def __init__(self, session):
@@ -26,8 +27,13 @@ class AnalysisRepository(BaseRepository[Analysis]):
     **filters,
     ) -> list[Analysis]:
         query = (
-            select(self.model)
-            .join(Video, self.model.video_id == Video.id)
+            select(
+            Analysis,
+            Video.name.label("video_name"),
+            DCamera.camera_name.label("camera_name"),
+            )
+            .join(Video, Analysis.video_id == Video.id)
+            .join(DCamera, Video.camera_id == DCamera.id)
         )
 
         if filters.get("status") is not None:
@@ -64,7 +70,7 @@ class AnalysisRepository(BaseRepository[Analysis]):
 
         result = await self.session.execute(query)
 
-        return result.scalars().all()
+        return result.all()
 
     async def set_processing(self, id: UUID) -> Analysis | None:
         query = (
