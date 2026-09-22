@@ -18,7 +18,7 @@ class AnalysisStatus(str, Enum):
     ERROR = "error"
 
 
-class AnalysisModel(Base):
+class Analysis(Base):
     __tablename__ = "analyses"
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -28,6 +28,7 @@ class AnalysisModel(Base):
         PGUUID(as_uuid=True),
         ForeignKey("video.id", ondelete="CASCADE"),
         nullable=False,
+        unique=True,
         index=True,
     )
     status: Mapped[AnalysisStatus] = mapped_column(
@@ -46,4 +47,4 @@ class AnalysisModel(Base):
     )
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    video: Mapped["Video"] = relationship("Video", back_populates="analyses")
+    video: Mapped["Video"] = relationship("Video", back_populates="analysis")

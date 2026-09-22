@@ -18,7 +18,7 @@ from src.data.models.user_model import User
 from src.data.models.refresh_token_model import RefreshToken
 from src.data.models.camera_model import DCamera
 from src.data.models.video_model import Video
-from src.data.models.analysis_model import AnalysisModel
+from src.data.models.analysis_model import Analysis
 from src.core.database import Base
 
 # this is the Alembic Config object

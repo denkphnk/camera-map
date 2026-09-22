@@ -94,4 +94,4 @@ class Video(Base):
     )
 
 
-    analyses = relationship("AnalysisModel", back_populates="video")
+    analysis = relationship("AnalysisModel", back_populates="video")
